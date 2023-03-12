@@ -1,0 +1,22 @@
+{
+  "name": "studyroom-bot",
+  "version": "0.0.0",
+  "description": "ボイスチャットに参加している時間を勉強時間と見なし、時間を記録するBOTです。",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/starkoka/StudyRoom-BOT.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/starkoka/StudyRoom-BOT/issues"
+  },
+  "homepage": "https://github.com/starkoka/StudyRoom-BOT#readme",
+  "dependencies": {
+    "discord.js": "^14.7.1"
+  }
+}
