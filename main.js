@@ -2,6 +2,7 @@ const { Client, GatewayIntentBits, Collection} = require('discord.js');
 let config = require('./config.json')
 const path = require("path");
 const fs = require("fs");
+const db = require("./functions/db.js");
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -26,6 +27,9 @@ client.once("ready", async () => {
     }
     console.log("Ready!");
 });
+
+db.addChannel("957687072133615716","1038826765486936144").catch(console.dir);
+
 
 /*スラッシュコマンド呼び出し*/
 client.on("interactionCreate", async (interaction) => {
