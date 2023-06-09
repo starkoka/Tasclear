@@ -18,7 +18,9 @@
   "homepage": "https://github.com/starkoka/StudyRoom-BOT#readme",
   "dependencies": {
     "@discordjs/rest": "^1.5.0",
+    "discord-buttons": "^4.0.0-deprecated",
     "discord.js": "^14.7.1",
+    "discord.js-buttons": "^1.0.0",
     "enquirer": "^2.3.6",
     "mongodb": "^5.1.0"
   }

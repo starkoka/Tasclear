@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, Collection, Partials} = require('discord.js');
+const { Client, GatewayIntentBits, Collection, Partials,Events} = require('discord.js');
 const config = require('./config.json')
 const path = require("path");
 const fs = require("fs");
@@ -7,7 +7,9 @@ const client = new Client({
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildVoiceStates,
         GatewayIntentBits.GuildMembers,
-        GatewayIntentBits.GuildPresences
+        GatewayIntentBits.GuildPresences,
+        GatewayIntentBits.GuildMessageReactions,
+        GatewayIntentBits.DirectMessageReactions
     ],
     partials: [Partials.Channel],
 });
@@ -17,6 +19,7 @@ module.exports.client=client;
 /*関数読み込み*/
 const db = require("./functions/db.js");
 const system = require('./functions/logsystem.js');
+const help = require('./functions/help.js');
 
 
 /*スラッシュコマンド登録*/
@@ -25,6 +28,8 @@ const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 client.commands = new Collection();
 module.exports = client.commands;
+
+/*Readyイベント*/
 client.once("ready", async () => {
     for (const file of commandFiles) {
         const filePath = path.join(commandsPath, file);
@@ -37,9 +42,6 @@ client.once("ready", async () => {
     console.log("ready");
     await system.log("Ready!");
 });
-
-
-
 
 /*スラッシュコマンド呼び出し*/
 client.on("interactionCreate", async (interaction) => {
@@ -62,5 +64,14 @@ client.on("interactionCreate", async (interaction) => {
         }
     }
 });
+
+
+client.on("interactionCreate", async (interaction) => {
+    if (!interaction.isStringSelectMenu()) return;
+    if (interaction.customId === "adminHelp"){
+        help.adminHelpDisplay(interaction);
+    }
+})
+
 
 client.login(config.token);
