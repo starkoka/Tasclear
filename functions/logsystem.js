@@ -1,5 +1,6 @@
 const {EmbedBuilder, Client, GatewayIntentBits, Partials} = require("discord.js");
 const config = require("../config.json");
+const {client} = require("../main");
 
 /***
  * ログをコンソールとdiscordに送信する
@@ -66,4 +67,5 @@ exports.warn = async function func(message,title="警告") {
     await logChannel.send({embeds: [embed]});
     await errorChannel.send({embeds: [embed]});
 }
+
 
