@@ -1,14 +1,18 @@
 const { Client, GatewayIntentBits, Collection} = require('discord.js');
-let config = require('./config.json')
+const config = require('./config.json')
 const path = require("path");
 const fs = require("fs");
-const db = require("./functions/db.js");
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMembers,
     ],
 });
+
+/*関数読み込み*/
+const db = require("./functions/db.js");
+const system = require('./functions/logsystem.js');
+
 
 /*スラッシュコマンド登録*/
 module.exports.client=client;
@@ -28,7 +32,7 @@ client.once("ready", async () => {
     console.log("Ready!");
 });
 
-db.addChannel("957687072133615716","1038826765486936144").catch(console.dir);
+
 
 
 /*スラッシュコマンド呼び出し*/
