@@ -1,13 +1,23 @@
-const { Client, GatewayIntentBits, Collection} = require('discord.js');
-let config = require('./config.json')
+const { Client, GatewayIntentBits, Collection, Partials} = require('discord.js');
+const config = require('./config.json')
 const path = require("path");
 const fs = require("fs");
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildVoiceStates,
         GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildPresences
     ],
+    partials: [Partials.Channel],
 });
+module.exports.client=client;
+
+
+/*関数読み込み*/
+const db = require("./functions/db.js");
+const system = require('./functions/logsystem.js');
+
 
 /*スラッシュコマンド登録*/
 module.exports.client=client;
@@ -24,8 +34,12 @@ client.once("ready", async () => {
         }
 
     }
-    console.log("Ready!");
+    console.log("ready");
+    await system.log("Ready!");
 });
+
+
+
 
 /*スラッシュコマンド呼び出し*/
 client.on("interactionCreate", async (interaction) => {
@@ -35,12 +49,17 @@ client.on("interactionCreate", async (interaction) => {
     const command = interaction.client.commands.get(interaction.commandName);
 
     if (!command) return;
-    console.log("SlashCommand : "+command.data.name);
+    await system.log(command.data.name,"SlashCommand");
     try {
         await command.execute(interaction);
     } catch (error) {
-        console.error(error);
-        await interaction.reply({ content: 'エラーが発生しました。', ephemeral: true });
+        await system.error("スラッシュコマンド実行時エラー : " + command.data.name,error);
+        try{
+            await interaction.reply({ content: 'おっと、想定外の事態が起きちゃった。管理者に連絡してくれ。', ephemeral: true });
+        } catch{
+            const reply = await interaction.editReply({ content: 'エラーが発生しました。', ephemeral: true });
+            await reply.reactions.removeAll()
+        }
     }
 });
 

@@ -4,9 +4,9 @@ module.exports = [
     {
         data: new SlashCommandBuilder()
             .setName('ping')
-            .setDescription('ping command'),
+            .setDescription('このBOTのpingを測定します'),
         async execute(interaction) {
-            await interaction.reply('pong!');
+            await interaction.reply( `Ping : ${interaction.client.ws.ping}ms` );
         },
     },
 ]
