@@ -66,12 +66,19 @@ client.on("interactionCreate", async (interaction) => {
 });
 
 
-client.on("interactionCreate", async (interaction) => {
-    if (!interaction.isStringSelectMenu()) return;
-    if (interaction.customId === "adminHelp"){
-        help.adminHelpDisplay(interaction);
+//StringSelectMenu受け取り
+client.on(Events.InteractionCreate, async interaction => {
+    if(interaction.isStringSelectMenu()) {
+        if (interaction.customId === "adminHelp"){
+            await help.adminHelpDisplay(interaction);
+        }
+        else if (interaction.customId === "help"){
+            await help.helpDisplay(interaction);
+        }
     }
-})
+});
 
 
-client.login(config.token);
+if(require.main === module) {
+    client.login(config.token);
+}

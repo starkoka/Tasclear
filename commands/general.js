@@ -12,11 +12,20 @@ module.exports = [
     },
     {
         data: new SlashCommandBuilder()
-            .setName('admin')
-            .setDescription('管理者向けメニューをDMで表示します。')
-            .setDefaultMemberPermissions(1<<3),
+            .setName('help')
+            .setDescription('このBOTのヘルプを表示します'),
         async execute(interaction) {
-            await interaction.reply({ content: "DMに管理者向けメニューを送信しました。受信できていない場合、以下に該当していないかどうかご確認ください。\n・このサーバー上の他のメンバーからのDMをOFFにしている\n・フレンドからのDMのみを許可している\n・StudyRoomBOTをブロックしている", ephemeral: true });
+            await help.helpSend(interaction);
+        },
+    },
+    {
+        data: new SlashCommandBuilder()
+            .setName('admin-help')
+            .setDescription('管理者向けメニューをDMで表示します。')
+            .setDefaultMemberPermissions(1<<3)
+            .setDMPermission(false),
+        async execute(interaction) {
+            await interaction.reply({ content: "DMに管理者向けメニューを送信しました。受信できていない場合、以下に該当していないかどうかご確認ください。\n・このサーバー上の他のメンバーからのDMをOFFにしている\n・フレンドからのDMのみを許可している\n・このBOTをブロックしている", ephemeral: true });
             await help.adminHelpSend(interaction.user);
         },
     },
