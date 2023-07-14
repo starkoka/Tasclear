@@ -1,0 +1,57 @@
+name: バグ報告
+description: 発見したバグを報告する
+title: "[bug]: <題名>"
+labels: ["bug"]
+body:
+  - type: checkboxes
+    attributes:
+      label: 同様のバグのIssueはありますか?
+      description: 報告しようとしているバグのIssueが既に建てられているかどうか確認してください.
+      options:
+        - label: 確認しました
+          required: true
+  - type: textarea
+    attributes:
+      label: バグの説明
+      description: バグの内容を簡潔に教えてください.
+      placeholder: 内容を入力してください
+      value: "世界が滅亡した"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 本来すべき動作
+      description: 本来の動作内容を教えてください．
+      placeholder: 内容を入力してください
+      value: "世界が存続する"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: バグの再現方法
+      description: バグの再現方法を教えてください．
+      placeholder: |
+        1. 入力欄に複数の"CON"を入れる
+        2. 実行する
+        3. 世界が滅亡する
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 環境
+      description: StudyRoom BOTの実行環境を入力してください．
+      placeholder: 内容を入力してください
+      value: |
+        + **OS**: Windows 11 Pro 22H2
+        + **Discord**: Stable 199933 (db1e138)
+        + **StudyRoom BOT**: v1.0.0
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 補足情報
+      description: |
+        他に補足があれば,それを教えてください．
+        （スクリーンショット等も入力できます．）
+    validations:
+      required: false
