@@ -8,7 +8,8 @@ const {client} = require("../main");
  * @param title ログのタイトル。省略可
  */
 exports.log = async function func(message,title) {
-    console.log(`${title ?? "システムログ"} ----\n${message.trim()}\n--------\n`);
+    const date = new Date().toLocaleString(); // YYYY/MM/DD hh:mm:ss形式に変換
+    console.log(`${title ?? "システムログ"} ----\n${(message.trim().split("```").join(''))}\n--------${date}\n`);
     const embed = new EmbedBuilder()
         .setColor(0x00A0EA)
         .setTitle(title ?? "システムログ")
@@ -23,7 +24,7 @@ exports.log = async function func(message,title) {
 /***
  * エラー通知とログをコンソールとdiscordに送信する
  * @param message エラーメッセージの本文
- * @param error エラーコード。error.stackが存在する場合にそれが送られる。省略可
+ * @param error エラーオブジェクト。error.stackが存在する場合にそれが送られる。省略可
  * @param title エラーメッセージのタイトル。省略可
  */
 exports.error = async function func(message,error= {stack:""},title="エラー") {
@@ -33,8 +34,8 @@ exports.error = async function func(message,error= {stack:""},title="エラー")
         .setDescription(message)
         .setTimestamp()
         .setFooter({ text: 'Discord Log System' });
-
-    console.error(`${title} ----\n${message.trim()}\n\n${error.stack}\n\n--------\n`);
+    const date = new Date().toLocaleString(); // YYYY/MM/DD hh:mm:ss形式に変換
+    console.error(`${title} ----\n${(message.trim().split("```").join(''))}\n\n${error.stack}\n\n--------${date}\n`);
 
     const errorChannel = await client.channels.fetch(config.errorSystem);
     await errorChannel.send({embeds: [embed]});
@@ -53,7 +54,8 @@ exports.error = async function func(message,error= {stack:""},title="エラー")
  * @param title ログのタイトル。省略可
  */
 exports.warn = async function func(message,title="警告") {
-    console.warn(`${title} ----\n${message.trim()}\n--------\n`);
+    const date = new Date().toLocaleString(); // YYYY/MM/DD hh:mm:ss形式に変換
+    console.warn(`${title} ----\n${(message.trim().split("```").join(''))}\n--------${date}\n`);
     const embed = new EmbedBuilder()
         .setColor(0xEC9F38)
         .setTitle(title)
@@ -67,5 +69,4 @@ exports.warn = async function func(message,title="警告") {
     await logChannel.send({embeds: [embed]});
     await errorChannel.send({embeds: [embed]});
 }
-
 

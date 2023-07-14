@@ -51,16 +51,32 @@ client.on("interactionCreate", async (interaction) => {
     const command = interaction.client.commands.get(interaction.commandName);
 
     if (!command) return;
-    await system.log(command.data.name,"SlashCommand");
+    let guild,channel;
+    if(!interaction.guildId) {
+        guild = {name:"ダイレクトメッセージ",id:"---"};
+        channel = {name:"---",id:"---"};
+    }
+    else{
+        guild = client.guilds.cache.get(interaction.guildId) ?? await client.guilds.fetch(interaction.guildId);
+        channel = client.channels.cache.get(interaction.channelId) ?? await client.channels.fetch(interaction.channelId);
+    }
+    await system.log(`コマンド名:${command.data.name}\`\`\`\nギルド　　：${guild.name}\n(ID:${guild.id})\n\nチャンネル：${channel.name}\n(ID:${channel.id})\n\nユーザ　　：${interaction.user.username}#${interaction.user.discriminator}\n(ID:${interaction.user.id})\`\`\``, "SlashCommand");
     try {
         await command.execute(interaction);
-    } catch (error) {
-        await system.error("スラッシュコマンド実行時エラー : " + command.data.name,error);
-        try{
-            await interaction.reply({ content: 'おっと、想定外の事態が起きちゃった。管理者に連絡してくれ。', ephemeral: true });
-        } catch{
-            const reply = await interaction.editReply({ content: 'エラーが発生しました。', ephemeral: true });
-            await reply.reactions.removeAll()
+    }
+    catch(error) {
+        await system.error(`スラッシュコマンド実行時エラー : ${command.data.name}\n\`\`\`\nギルド　　：${guild.name}\n(ID:${guild.id})\n\nチャンネル：${channel.name}\n(ID:${channel.id})\n\nユーザ　　：${interaction.user.username}#${interaction.user.discriminator}\n(ID:${interaction.user.id})\`\`\``, error);
+        try {
+            await interaction.reply({content: 'おっと、想定外の事態が起きちゃった。[Issue](https://github.com/starkoka/StudyRoom-BOT/issues)に連絡してくれ。', ephemeral: true});
+        }
+        catch {
+            try{
+                await interaction.editReply({
+                    content: 'おっと、想定外の事態が起きちゃった。[Issue](https://github.com/starkoka/StudyRoom-BOT/issues)に連絡してくれ。',
+                    ephemeral: true
+                });
+            }
+            catch{} //edit先が消えてる可能性を考えてtryに入れる
         }
     }
 });
