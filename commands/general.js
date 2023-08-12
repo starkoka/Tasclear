@@ -1,5 +1,5 @@
-const { SlashCommandBuilder} = require('discord.js')
-const help = require('../functions/help.js')
+const { SlashCommandBuilder} = require('discord.js');
+const help = require('../functions/help.js');
 
 module.exports = [
     {
