@@ -2,7 +2,7 @@ const { Client, GatewayIntentBits, Collection, Partials,Events} = require('disco
 const config = require('./config.json')
 const path = require("path");
 const fs = require("fs");
-const client = new Client({
+global.client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildVoiceStates,
