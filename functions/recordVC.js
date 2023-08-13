@@ -5,10 +5,12 @@ const userData = require('./userData.js');
 
 async function joinVC(newState,newChannel){
     await userData.makeUserData(newState.id);
+    const date = new Date();
+    date.setTime(date.getTime() + 1000*60*60*9); //JST
     const data = {
         isJoined: true,
-        joinedAt:new Date(),
-        lastUpdate: new Date()
+        joinedAt: date,
+        lastUpdate: date
     }
     await db.update("main","user",{"userId":newState.id},{$set:data});
 }

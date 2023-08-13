@@ -8,9 +8,11 @@ const db = require('./db.js');
  * @returns {Promise<void>}
  */
 exports.makeUserData = async function func(userId){
-    const data = await db.find("main","user",{"userID":userId});
+    const data = await db.find("main","user",{"userId":userId});
     if(data.length === 0){
-        const date = new Date;
+        const date = new Date();
+        date.setTime(date.getTime() + 1000*60*60*9); //JST
+
         const weeklyData=[];
         for(let i = 0; i < date.getDay()+1; i++){
             weeklyData.push(0);
