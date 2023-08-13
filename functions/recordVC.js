@@ -27,21 +27,28 @@ async function leaveVC(oldState){
 
     if(now < secondDay){ //日付をまたがない場合
         const day = (now.getDay() === 0 ? 6 : now.getDay()-1);
-        user.weeklyData[day] += (now-user.joinedAt) / 1000;
+        user.weeklyData[day] += Math.floor((now-user.joinedAt) / 1000);
+        user.weeklyTotal += Math.floor((now-user.joinedAt) / 1000);
+        user.monthlyData += Math.floor((now-user.joinedAt) / 1000);
     }
     else if(now === secondDay){ //万が一ミリ秒単位で真夜中だったら
         user  = await userData.getUser(oldState.id);
         if(now.getDay() === 1){
-            user.monthlyData[0][6] += (now-user.joinedAt) / 1000;
+            user.monthlyData[0][6] += Math.floor((now-user.joinedAt) / 1000);
+            user.monthlyData += Math.floor((now-user.joinedAt) / 1000);
         }
         else{
             const day = (now.getDay() === 0 ? 5 : now.getDay()-2);
-            user.weeklyData[day] += (now-user.joinedAt) / 1000;
+            user.weeklyData[day] += Math.floor((now-user.joinedAt) / 1000);
+            user.weeklyTotal += Math.floor((now-user.joinedAt) / 1000);
+            user.monthlyData += Math.floor((now-user.joinedAt) / 1000);
         }
     }
     else{
 
     }
+
+    await db.update("main","user",{"userId":oldState.id},{$set:user});
 }
 
 exports.vcStateUpdate = async function func(oldState, newState) {

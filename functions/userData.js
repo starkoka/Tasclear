@@ -24,12 +24,14 @@ exports.getUser = async function func(userId){
     }
 
     if(date.toFormat("YYYYMMDD") !== user.lastUpdate.toFormat("YYYYMMDD")) {　//同じ日
+        user.dailyGoal = null;
         if (nextMonday > date) { //同じ週
             for (let i = 0; i < (date.getDay()===0 ? 7 : date.getDay()) ; i++) {
                 if (user.weeklyData[i] === null) user.weeklyData[i] = 0;
             }
         }
         else { //異なる週
+            user.weeklyGoal = null;
             let i=1;
             for(; i < 1+4; i++){
                 nextMonday.setDate(nextMonday.getDate() + 7);
