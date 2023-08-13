@@ -15,7 +15,7 @@ async function joinVC(newState){
 }
 
 async function leaveVC(oldState){
-    const user  = (await db.find("main","user",{"userId":oldState.id}))[0];
+    const user  = userData.getUser(oldState.id);
 }
 
 exports.vcStateUpdate = async function func(oldState, newState) {
