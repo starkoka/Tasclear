@@ -2,8 +2,12 @@ const {StringSelectMenuBuilder, StringSelectMenuOptionBuilder, EmbedBuilder, Act
 const system = require('./logsystem.js');
 const db = require('./db.js');
 
-
-exports.makeNewData = async function func(userId){
+/***
+ * 空のuserDataデータを作成する(既にある場合は実行されない)
+ * @param userId データを作成するユーザーID
+ * @returns {Promise<void>}
+ */
+exports.makeUserData = async function func(userId){
     const data = await db.find("main","user",{"userID":userId});
     if(data.length === 0){
         const date = new Date;

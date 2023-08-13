@@ -3,7 +3,7 @@ const system = require('./logsystem.js');
 const db = require('./db.js');
 
 async function joinVC(newState,newChannel){
-
+    const date = new Date(newState);
 }
 
 async function leaveVC(oldState,oldChannel){
