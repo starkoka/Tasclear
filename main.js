@@ -20,6 +20,7 @@ module.exports.client=client;
 const db = require("./functions/db.js");
 const system = require('./functions/logsystem.js');
 const help = require('./functions/help.js');
+const recordVC = require('./functions/recordVC.js')
 
 
 /*スラッシュコマンド登録*/
@@ -94,6 +95,9 @@ client.on(Events.InteractionCreate, async interaction => {
     }
 });
 
+client.on('voiceStateUpdate', (oldState, newState) => {
+    recordVC.vcStateUpdate(oldState, newState);
+})
 
 if(require.main === module) {
     client.login(config.token);
