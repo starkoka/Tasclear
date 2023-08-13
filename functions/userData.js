@@ -24,7 +24,8 @@ exports.makeNewData = async function func(userId){
             thisWeekGoal:null,
             todayGoal:null,
             weeklyData:weeklyData,
-            monthlyData:[0,0,0]
+            monthlyData:[0,0,0],
+            lastUpdate:date
         }
 
         await db.insert("main","user",newData);
