@@ -15,12 +15,12 @@ exports.makeUserData = async function func(userId){
         for(let i = 0; i < date.getDay()+1; i++){
             weeklyData.push(0);
         }
-        for(let i = 0; i < 7-date.getDay(); i++){
+        for(let i = 0; i < 7-(date.getDay()+1); i++){
             weeklyData.push(null);
         }
 
         const newData = {
-            userID:userId,
+            userId:userId,
             isJoined:false,
             joinedAt:null,
             weeklyGoal:null,
