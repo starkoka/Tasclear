@@ -7,7 +7,7 @@ require('date-utils');
 const ZERO = [0,0,0,0,0,0,0];
 
 /**
- * userIdから情報を取得し、相対的な日付のデータを修正して返す&更新する関数
+ * userIdから情報を取得し、相対的な日付のデータを修正して返す&更新する関数(未作成の場合データが作成される)
  * @param userId 取得するユーザーID
  * @param userId
  * @returns {Promise<WithId<Document>>}
@@ -80,7 +80,7 @@ exports.getUser = async function func(userId){
 }
 
 /**
- * 空のuserDataデータを作成する(既にある場合は実行されない)
+ * 空のuserDataデータを作成する(既にある場合getUser関数が呼ばれてその結果が返される)
  * @param userId データを作成するユーザーID
  * @returns {Promise<WithId<Document>>}
  */
