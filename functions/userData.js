@@ -15,7 +15,7 @@ const ZERO = [0,0,0,0,0,0,0];
 exports.getUser = async function func(userId){
     const data = await db.find("main","user",{userId:userId});
     if(data.length === 0){
-        await userData.makeUserData(userId);
+        return await userData.makeUserData(userId);
     }
     else{
         const user = data[0];
@@ -79,16 +79,15 @@ exports.getUser = async function func(userId){
     }
 }
 
-/***
+/**
  * 空のuserDataデータを作成する(既にある場合は実行されない)
  * @param userId データを作成するユーザーID
- * @returns {Promise<void>}
+ * @returns {Promise<WithId<Document>>}
  */
 exports.makeUserData = async function func(userId){
     const data = await db.find("main","user",{"userId":userId});
     if(data.length === 0){
         const date = new Date();
-
         const weeklyData=[];
         const loop = (date.getDay() === 0 ? 7 : date.getDay());
         for(let i = 0; i < loop; i++){
@@ -115,7 +114,5 @@ exports.makeUserData = async function func(userId){
 
         await db.insert("main","user",newData);
     }
-    else{
-        await userData.getUser(userId);
-    }
+    return await userData.getUser(userId);
 }
