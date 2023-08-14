@@ -40,7 +40,7 @@ module.exports = [
                 .setTitle('StudyRoom BOT概要')
                 .setAuthor({
                     name: 'StudyRoom BOT',
-                    iconURL: 'https://cdn.discordapp.com/attachments/1124343762429149185/1140352970316329001/ddf123f4cea91ab5.png',
+                    iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
                     url: 'https://github.com/starkoka/StudyRoom-BOT'
                 })
                 .setDescription('このbotの概要を紹介します')
