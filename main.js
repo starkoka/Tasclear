@@ -1,5 +1,5 @@
 const { Client, GatewayIntentBits, Collection, Partials,Events} = require('discord.js');
-const config = require('./config.json')
+const config = require('./config.json');
 const path = require("path");
 const fs = require("fs");
 global.client = new Client({
@@ -13,13 +13,11 @@ global.client = new Client({
     ],
     partials: [Partials.Channel],
 });
-module.exports.client=client;
-
 
 /*関数読み込み*/
-const db = require("./functions/db.js");
 const system = require('./functions/logsystem.js');
 const help = require('./functions/help.js');
+const recordVC = require('./functions/recordVC.js');
 
 
 /*スラッシュコマンド登録*/
@@ -94,6 +92,9 @@ client.on(Events.InteractionCreate, async interaction => {
     }
 });
 
+client.on('voiceStateUpdate', (oldState, newState) => {
+    recordVC.vcStateUpdate(oldState, newState);
+})
 
 if(require.main === module) {
     client.login(config.token);
