@@ -1,8 +1,9 @@
-const {StringSelectMenuBuilder, StringSelectMenuOptionBuilder, EmbedBuilder, ActionRowBuilder} = require("discord.js");
+const {StringSelectMenuBuilder, StringSelectMenuOptionBuilder, EmbedBuilder, ActionRowBuilder, version} = require("discord.js");
 const system = require('./logsystem.js');
 const db = require('./db.js');
 const userData = require('./userData.js');
 require('date-utils');
+const packageVer = require("../package.json");
 
 const ZERO = [0,0,0,0,0,0,0];
 
@@ -157,4 +158,54 @@ exports.makeUserData = async function func(userId){
         await db.insert("main","user",newData);
     }
     return await userData.getUser(userId);
+}
+
+exports.generateDataEmbed = async function func(userId,type){
+    const user = client.users.cache.get(userId) ?? await client.users.fetch(userId);
+    const data = await userData.getUser(userId);
+    let title = "今週の";
+    if(type === -1){
+        let i=0;
+        while(data.weeklyData[i]){
+
+        }
+    }
+    else if(type === -2){
+
+    }
+    else{
+
+    }
+
+    return new EmbedBuilder()
+        .setColor(user.rank.color)
+        .setTitle(`${title}の勉強データ`)
+        .setAuthor({
+            name: 'StudyRoom BOT',
+            iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
+            url: 'https://github.com/starkoka/StudyRoom-BOT'
+        })
+        .setDescription('このbotの概要を紹介します')
+        .addFields(
+            [
+                {
+                    name: 'バージョン情報',
+                    value: `v${packageVer.version}`,
+                },
+                {
+                    name: 'ソースコード',
+                    value: 'このBOTは、オープンソースとなっています。[GitHub](https://github.com/starkoka/StudyRoom-BOT)にて公開されています。\n'
+                },
+                {
+                    name: 'バグの報告先',
+                    value: "[Issue](https://github.com/starkoka/StudyRoom-BOT/issues)までバグの報告をお願いします。\nサポート等の詳細は`/help`や`/admin-help`を実行してください。\n"
+                },
+                {
+                    name: '実行環境',
+                    value: `node.js v${process.versions.node} \ndiscord.js v${version} \n\nDocker v24.0.2\nMongoDB 6.0 Powered by Google Cloud`
+                },
+            ]
+        )
+        .setTimestamp()
+        .setFooter({ text: 'Developed by 「タスクマネージャーは応答していません」' })
 }
