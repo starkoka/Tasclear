@@ -23,7 +23,6 @@ exports.getUser = async function func(userId){
         nextMonday.setDate(user.lastUpdate.getDate() - user.lastUpdate.getDay() + 7 + 1);
     }
 
-
     if(date.toFormat("YYYYMMDD") !== user.lastUpdate.toFormat("YYYYMMDD")) {　//同じ日
         if (nextMonday > date) { //同じ週
             for (let i = 0; i < (date.getDay()===0 ? 7 : date.getDay()) ; i++) {
@@ -40,15 +39,19 @@ exports.getUser = async function func(userId){
             switch(i){
                 case 1:
                     user.monthlyData = [user.weeklyData,user.monthlyData[0],user.monthlyData[1]];
+                    user.monthlyTotal = user.weeklyTotal +　user.monthlyData[0].reduce((sum, element) => sum + element, 0) + user.monthlyData[1].reduce((sum, element) => sum + element, 0);
                     break;
                 case 2:
                     user.monthlyData = [ZERO,user.weeklyData,user.monthlyData[0]];
+                    user.monthlyTotal = user.weeklyTotal +　user.monthlyData[0].reduce((sum, element) => sum + element, 0)
                     break;
                 case 3:
                     user.monthlyData = [ZERO,ZERO,user.weeklyData];
+                    user.monthlyTotal = user.weeklyTotal;
                     break;
                 default:
                     user.monthlyData = [ZERO,ZERO,ZERO];
+                    user.monthlyTotal = 0;
                     break;
             }
             user.weeklyData=[];
@@ -59,6 +62,7 @@ exports.getUser = async function func(userId){
             for(let i = 0; i < 7-loop; i++){
                 user.weeklyData.push(null);
             }
+            user.weeklyTotal = 0;
         }
         user.lastUpdate = date;
         await db.update("main","user",{"userId":userId},{$set:user});
@@ -95,7 +99,9 @@ exports.makeUserData = async function func(userId){
             thisWeekGoal:null,
             todayGoal:null,
             weeklyData:weeklyData,
+            weeklyTotal:0,
             monthlyData:[ZERO,ZERO,ZERO],
+            monthlyTotal:0,
             lastUpdate:date
         }
 
