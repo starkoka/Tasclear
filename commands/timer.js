@@ -110,7 +110,6 @@ module.exports = [
                 // eslint-disable-next-line
                 for (const reminder of reminders) {
                     if (reminder.date) {
-                        console.log("run");
                         scheduledJobs.push({
                             jobId,
                             guildId,
