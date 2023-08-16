@@ -8,11 +8,11 @@ module.exports = [
     {
         data: new SlashCommandBuilder()
             .setName("goal-set")
-            .setDescription("目標の時間を設定します")
+            .setDescription("目標を設定します")
             .addStringOption((option) =>
                 option
-                    .setName("select-goal")
-                    .setDescription("目標時間を設定するオプションを選択します")
+                    .setName("対象")
+                    .setDescription("目標にする対象を選択します")
                     .setRequired(true)
                     .setChoices(
                         { name: "今日", value: "0" },
@@ -20,7 +20,8 @@ module.exports = [
                         { name: "毎日", value: "2" },
                         { name: "毎週", value: "3" },
                     ),
-            ),
+            )
+            .addIntegerOption((option) => option.setName("時間").setDescription("時間を設定します").setRequired(true)),
 
         /* 一応おいて置くの細道
             .addIntegerOption(option => option.setName("今日").setDescription("今日の目標時間を設定します").setRequired(false))
@@ -31,13 +32,14 @@ module.exports = [
 
         async execute(interaction) {
             // 入力されたoptionの代入
-            const goal = interaction.option.getInteger("select-goal");
+            const goal = interaction.options.getString("対象");
 
             const userID = interaction.user.id;
+            console.log(goal);
 
             switch (goal) {
                 case "0": {
-                    const goalToday = interaction.option.getInteger("今日");
+                    const goalToday = interaction.options.getInteger("時間");
                     await db.update(
                         "main",
                         "user",
@@ -51,7 +53,7 @@ module.exports = [
                     break;
                 }
                 case "1": {
-                    const goalThisWeek = interaction.option.getInteger("今週");
+                    const goalThisWeek = interaction.options.getInteger("時間");
                     await db.update(
                         "main",
                         "user",
@@ -65,7 +67,7 @@ module.exports = [
                     break;
                 }
                 case "2": {
-                    const goalEveryDay = interaction.option.getInteger("毎日");
+                    const goalEveryDay = interaction.options.getInteger("時間");
                     await db.update(
                         "main",
                         "user",
@@ -79,7 +81,7 @@ module.exports = [
                     break;
                 }
                 case "3": {
-                    const goalEveryWeek = interaction.option.getInteger("毎週");
+                    const goalEveryWeek = interaction.options.getInteger("時間");
                     await db.update(
                         "main",
                         "user",
@@ -95,6 +97,9 @@ module.exports = [
                 default:
                     break;
             }
+
+            // 登録確認
+            await interaction.reply({ content: "目標を設定しました", ephemeral: true });
         },
     },
 ];
