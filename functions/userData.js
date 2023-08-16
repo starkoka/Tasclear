@@ -71,9 +71,52 @@ exports.getUser = async function func(userId){
                 }
                 user.weeklyTotal = 0;
             }
-            user.lastUpdate = date;
-            await db.update("main","user",{"userId":userId},{$set:user});
         }
+
+        const hour = Math.floor(Math.max(user.weeklyTotal,user.monthlyData[0].reduce((sum, element) => sum + element, 0))/60/60);
+        if(hour >= 48){
+            user.rank.color = 0x6DBCD1
+            user.rank.name = "Platinum";
+        }
+        else if(hour >= 42){
+            user.rank.color = 0xFFEB99
+            user.rank.name = "Gold";
+        }
+        else if(hour >= 35){
+            user.rank.color = 0xF00400
+            user.rank.name = "Red";
+        }
+        else if(hour >= 24){
+            user.rank.color = 0xF47A00
+            user.rank.name = "Orange"
+        }
+        else if(hour >= 20){
+            user.rank.color = 0xBCBC00
+            user.rank.name = "Yellow"
+        }
+        else if(hour >= 14){
+            user.rank.color = 0x0000F4
+            user.rank.name = "Blue"
+        }
+        else if(hour >= 10){
+            user.rank.color = 0x00B5F7
+            user.rank.name = "Light Blue"
+        }
+        else if(hour >= 7){
+            user.rank.color = 0x007B00
+            user.rank.name = "Green"
+        }
+        else if(hour >= 3){
+            user.rank.color = 0x7C3E00
+            user.rank.name = "Brown"
+        }
+        else{
+            user.rank.color = 0xD9D9D9
+            user.rank.name = "Gray"
+        }
+
+        user.lastUpdate = date;
+        await db.update("main","user",{"userId":userId},{$set:user});
         delete user._id;
         return user;
     }
@@ -99,6 +142,7 @@ exports.makeUserData = async function func(userId){
 
         const newData = {
             userId:userId,
+            rank:{name:"Gray",color:0xD9D9D9},
             isJoined:false,
             joinedAt:null,
             weeklyGoal:null,
@@ -109,7 +153,7 @@ exports.makeUserData = async function func(userId){
             weeklyTotal:0,
             monthlyData:[ZERO,ZERO,ZERO],
             monthlyTotal:0,
-            lastUpdate:date
+            lastUpdate:date,
         }
 
         await db.insert("main","user",newData);
