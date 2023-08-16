@@ -39,9 +39,17 @@ Date.prototype.modify = function (obj) {
  * @return {EmbedBuilder} */
 function makeEmbed(message) {
     return new EmbedBuilder()
-        .setTitle("timer")
-        .setAuthor(/** @type {import(discord.js).EmbedAuthorOptions} */ { name: "StudyRoom-BOT" })
-        .setDescription(`${message}`);
+        .setColor(0x00a0ea)
+        .setTitle("タイマー")
+        .setAuthor(
+            /** @type {import(discord.js).EmbedAuthorOptions} */ {
+                name: "StudyRoom BOT",
+                iconURL: "https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png",
+                url: "https://github.com/starkoka/StudyRoom-BOT",
+            },
+        )
+        .setDescription(`${message}`)
+        .setTimestamp();
 }
 
 const scheduledJobs = [];
@@ -63,13 +71,14 @@ module.exports = [
 
             // ジョブ生成
             const jobId = crypto.randomUUID();
-            const guild = interaction.guildId;
-            const channel = interaction.channelId;
+            const { guildId } = interaction;
+            const { channelId } = interaction;
             // prettier-ignore
             /** @type {import(discord.js).TextChannel} */
             const currentChannel = await interaction.client
-                .guilds.cache.get(guild)
-                .channels.cache.get(channel);
+                .guilds.cache.get(guildId)
+                .channels.cache.get(channelId);
+            const userId = interaction.user.id;
             const today = new Date();
             const finallyDate = today.modify({ hour: hours, minute: minutes, second: seconds });
             const before1minDate = finallyDate.modify({ minute: -1 });
@@ -77,12 +86,22 @@ module.exports = [
             const reminders = [];
 
             if (today < finallyDate) {
-                reminders.push({ date: finallyDate, embeds: makeEmbed("it's time!") });
+                reminders.push({ date: finallyDate, embed: makeEmbed("時間です"), mention: userId, silent: false });
                 if (today < before1minDate) {
-                    reminders.push({ date: before1minDate, embeds: makeEmbed("it's time! - 1") });
+                    reminders.push({
+                        date: before1minDate,
+                        embed: makeEmbed("設定時刻1分前です"),
+                        mention: userId,
+                        silent: true,
+                    });
                 }
                 if (today < before5minDate) {
-                    reminders.push({ date: before5minDate, embeds: makeEmbed("it's time! - 5") });
+                    reminders.push({
+                        date: before5minDate,
+                        embed: makeEmbed("設定時刻5分前です"),
+                        mention: userId,
+                        silent: true,
+                    });
                 }
 
                 // ジョブ登録
@@ -92,13 +111,19 @@ module.exports = [
                         console.log("run");
                         scheduledJobs.push({
                             jobId,
-                            guild,
-                            channel,
+                            guildId,
+                            channelId,
+                            mentionId: reminder.mention,
                             date: reminder.date,
                         });
                         // eslint-disable-next-line
                         await schedule.scheduleJob(reminder.date, async () => {
-                            await currentChannel.send({ embeds: [reminder.message] });
+                            const message = {
+                                content: `<@${reminder.mention}>`,
+                                embeds: [reminder.embed],
+                            };
+                            if (reminder.silent) message.flags = [4096];
+                            await currentChannel.send(message);
                             const jobIndex = scheduledJobs.findIndex((job) => job.jobId === jobId);
                             scheduledJobs.splice(jobIndex, 1);
                         });
