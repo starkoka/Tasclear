@@ -1,9 +1,7 @@
-const {StringSelectMenuBuilder, StringSelectMenuOptionBuilder, EmbedBuilder, ActionRowBuilder, version} = require("discord.js");
-const system = require('./logsystem.js');
+const {EmbedBuilder} = require("discord.js");
 const db = require('./db.js');
 const userData = require('./userData.js');
 require('date-utils');
-const packageVer = require("../package.json");
 
 const ZERO = [0,0,0,0,0,0,0];
 
