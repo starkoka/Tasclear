@@ -96,6 +96,29 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     recordVC.vcStateUpdate(oldState, newState);
 })
 
+/*ギルド参加時*/
+client.on('guildCreate', async guild => {
+    
+})
+
+/*ギルド退出時*/
+client.on('guildDelete', async member => {
+
+})
+
+
+/*ユーザー参加時*/
+client.on('guildMemberAdd', async member => {
+
+})
+
+/*ユーザー退出時*/
+client.on('guildMemberRemove', async member => {
+
+})
+
+
+
 if(require.main === module) {
     client.login(config.token);
 }
