@@ -13,6 +13,7 @@ global.client = new Client({
     ],
     partials: [Partials.Channel],
 });
+module.exports.client=client;
 
 /*関数読み込み*/
 const system = require('./functions/logsystem.js');
@@ -21,7 +22,6 @@ const recordVC = require('./functions/recordVC.js');
 
 
 /*スラッシュコマンド登録*/
-module.exports.client=client;
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 client.commands = new Collection();
