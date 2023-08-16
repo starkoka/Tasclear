@@ -1,3 +1,4 @@
+const {EmbedBuilder} = require("discord.js");
 const db = require('./db.js');
 const userData = require('./userData.js');
 require('date-utils');
@@ -155,4 +156,112 @@ exports.makeUserData = async function func(userId){
         await db.insert("main","user",newData);
     }
     return await userData.getUser(userId);
+}
+
+exports.generateDataEmbed = async function func(userId,type){
+    const user = client.users.cache.get(userId) ?? await client.users.fetch(userId);
+    let username;
+    if(user.discriminator === "0"){
+        username = `@${user.username}`;
+    }
+    else{
+        username = `${user.username}#${user.discriminator}`;
+    }
+
+    if(user.bot){
+        return new EmbedBuilder()
+            .setColor(0xD9D9D9)
+            .setTitle(`${username} さんのデータ`)
+            .setThumbnail(user.displayAvatarURL())
+            .setAuthor({
+                name: 'StudyRoom BOT',
+                iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
+                url: 'https://github.com/starkoka/StudyRoom-BOT'
+            })
+            .setDescription('botのデータを確認することはできません')
+            .setTimestamp()
+            .setFooter({ text: 'Developed by 「タスクマネージャーは応答していません」' })
+    }
+
+    const data = await userData.getUser(userId);
+
+    const fields = [];
+    let title = "今週";
+    let total,ave,authorTime="",graph="";
+    const now = new Date();
+    if(type === -1){
+        let i=0;
+        now.setDate(now.getDate() - now.getDay());
+        while(data.weeklyData[i] && i<7){
+            now.setDate(now.getDate() + 1);
+            const time = data.weeklyData[i]/60/60;
+            fields.push({
+                name: now.toFormat("MM/DD"),
+                value: `\`\`\`${Math.floor(time*10)/10}時間\`\`\``
+            })
+            graph += `${now.toFormat("MM/DD")} [${"#".repeat(Math.floor(time/3))}${"-".repeat(8-Math.floor(time/3))}] ${Math.floor(time*10)/10}時間\n`
+            i++;
+        }
+        total = data.weeklyTotal;
+        ave = total/i;
+    }
+    else if(type === -2){
+        title = "直近4週間"
+        const now2 = new Date();
+        const day = now.getDay();
+        now.setDate(now.getDate() - now.getDay() + 1);
+        now2.setDate(now2.getDate() - now2.getDay() + 7);
+        for(let i = -1; i < 4-1 ; i++) {
+            let weeklyTotal;
+            if(i === -1)weeklyTotal = data.weeklyTotal/60/60;
+            else weeklyTotal = data.monthlyData[i].reduce((sum, element) => sum + element, 0)/60/60
+            fields.push({
+                name: `${now.toFormat("MM/DD")} ~ ${now2.toFormat("MM/DD")}`,
+                value: `\`\`\`${Math.floor(weeklyTotal*10)/10}時間\`\`\``
+            })
+            graph += `${now.toFormat("MM/DD")} ~ ${now2.toFormat("MM/DD")} [${"#".repeat(Math.floor(weeklyTotal/7/3))}${"-".repeat(8-Math.floor(weeklyTotal/7/3))}]\n`
+            now.setDate(now.getDate() - 7);
+            now2.setDate(now2.getDate() - 7);
+        }
+        fields.reverse();
+        total = data.weeklyTotal;
+        ave = total/(7*3 + day + 1);
+        authorTime = `週の平均時間：${Math.floor(ave*7/60/60*10)/10}時間\n`;
+    }
+    else{
+        if(type === 0)title = "先週";
+        else title = `${type}週間前`;
+        now.setDate(now.getDate() - now.getDay());
+        for(let i=0; i < 7; i++){
+            now.setDate(now.getDate() + 1);
+            const time = data.monthlyData[type][i]/60/60;
+            fields.push({
+                name: now.toFormat("MM/DD"),
+                value: `\`\`\`${Math.floor(time*10)/10}時間\`\`\``
+            })
+            graph += `${now.toFormat("MM/DD")} [${"#".repeat(Math.floor(time/3))}${"-".repeat(8-Math.floor(time/3))}]\n`
+        }
+        total = data.monthlyData[type].reduce((sum, element) => sum + element, 0);
+        ave = total/7;
+    }
+    /* 実験的機能のため無効化
+    fields.push({
+        name: "グラフ",
+        value: `\`\`\`${graph}\`\`\``
+    })
+    */
+
+    return new EmbedBuilder()
+        .setColor(data.rank.color)
+        .setTitle(`${username} さんの${title}のデータ`)
+        .setThumbnail(user.displayAvatarURL())
+        .setAuthor({
+            name: 'StudyRoom BOT',
+            iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
+            url: 'https://github.com/starkoka/StudyRoom-BOT'
+        })
+        .setDescription(`現在のランク：${data.rank.name}\n${title}の合計時間：${Math.floor(total/60/60*10)/10}時間\n${authorTime}1日の平均時間：${Math.floor(ave/60/60*10)/10}時間`)
+        .addFields(fields)
+        .setTimestamp()
+        .setFooter({ text: 'Developed by 「タスクマネージャーは応答していません」' })
 }

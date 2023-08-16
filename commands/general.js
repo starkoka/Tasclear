@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder, version} = require('discord.js');
 const packageVer = require('../package.json');
 const help = require('../functions/help.js');
+const userData = require('../functions/userData.js');
 
 module.exports = [
     {
@@ -67,6 +68,37 @@ module.exports = [
                 .setTimestamp()
                 .setFooter({ text: 'Developed by 「タスクマネージャーは応答していません」' })
             await interaction.reply({ embeds: [embed ]})
+        },
+    },
+    {
+        data: new SlashCommandBuilder()
+            .setName('studydata')
+            .setDescription('ユーザーの勉強時間を表示します')
+            .addIntegerOption(option =>
+                option
+                    .setName('期間')
+                    .setDescription('確認したいデータの期間を指定してください')
+                    .setRequired(false)
+                    .addChoices(
+                        { name: '今週', value: -1 },
+                        { name: '先週', value: 0 },
+                        { name: '2週間前', value: 1 },
+                        { name: '3週間前', value: 2 },
+                        { name: '直近4週間(週別データ)', value: -2},
+                    )
+            )
+            .addUserOption(option =>
+                option
+                    .setName('ユーザー')
+                    .setDescription('他の人の記録を見る場合に指定してください')
+                    .setRequired(false)
+            ),
+        async execute(interaction) {
+            await interaction.deferReply();
+            const userId = interaction.options.getUser('ユーザー') ?? interaction.user.id;
+            const type = interaction.options.getInteger('期間') ?? -1
+            const embed = await userData.generateDataEmbed(userId,type);
+            await interaction.editReply({embeds: [embed]});
         },
     },
 ]
