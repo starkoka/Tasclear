@@ -61,7 +61,8 @@ module.exports = [
             .setDescription("指定した時間のタイマーをかけます")
             .addIntegerOption((option) => option.setName("時間").setDescription("待機する時間を指定します").setRequired(true))
             .addIntegerOption((option) => option.setName("分").setDescription("待機する分間を指定します").setRequired(true))
-            .addIntegerOption((option) => option.setName("秒").setDescription("待機する秒間を指定します").setRequired(true)),
+            .addIntegerOption((option) => option.setName("秒").setDescription("待機する秒間を指定します").setRequired(true))
+            .addRoleOption((option) => option.setName("ロール").setDescription("メンションするロールを指定します")),
 
         async execute(interaction) {
             // オプション引数受け取り
@@ -78,7 +79,8 @@ module.exports = [
             const currentChannel = await interaction.client
                 .guilds.cache.get(guildId)
                 .channels.cache.get(channelId);
-            const userId = interaction.user.id;
+            const userId = `<@${interaction.user.id}>`;
+            const roleId = interaction.options.getRole("ロール");
             const today = new Date();
             const finallyDate = today.modify({ hour: hours, minute: minutes, second: seconds });
             const before1minDate = finallyDate.modify({ minute: -1 });
@@ -86,12 +88,12 @@ module.exports = [
             const reminders = [];
 
             if (today < finallyDate) {
-                reminders.push({ date: finallyDate, embed: makeEmbed("時間です"), mention: userId, silent: false });
+                reminders.push({ date: finallyDate, embed: makeEmbed("時間です"), mention: roleId || userId, silent: false });
                 if (today < before1minDate) {
                     reminders.push({
                         date: before1minDate,
                         embed: makeEmbed("設定時刻1分前です"),
-                        mention: userId,
+                        mention: roleId || userId,
                         silent: true,
                     });
                 }
@@ -99,7 +101,7 @@ module.exports = [
                     reminders.push({
                         date: before5minDate,
                         embed: makeEmbed("設定時刻5分前です"),
-                        mention: userId,
+                        mention: roleId || userId,
                         silent: true,
                     });
                 }
@@ -119,7 +121,7 @@ module.exports = [
                         // eslint-disable-next-line
                         await schedule.scheduleJob(reminder.date, async () => {
                             const message = {
-                                content: `<@${reminder.mention}>`,
+                                content: `${reminder.mention}`,
                                 embeds: [reminder.embed],
                             };
                             if (reminder.silent) message.flags = [4096];
