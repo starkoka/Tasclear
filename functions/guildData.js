@@ -13,6 +13,6 @@ exports.joinMember = async function(interaction){
     await db.insert("main","user",{userId:interaction.user.id,guildId:interaction.guildId});
 }
 
-exports.deleteMember = async function(interaction){
+exports.removeMember = async function(interaction){
     await db.delete("main","guildMember",{userId:interaction.user.id,guildId:interaction.guildId});
 }

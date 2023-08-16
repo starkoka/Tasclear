@@ -18,6 +18,7 @@ global.client = new Client({
 const system = require('./functions/logsystem.js');
 const help = require('./functions/help.js');
 const recordVC = require('./functions/recordVC.js');
+const guildData = require('./functions/guildData.js');
 
 
 /*スラッシュコマンド登録*/
@@ -97,24 +98,24 @@ client.on('voiceStateUpdate', (oldState, newState) => {
 })
 
 /*ギルド参加時*/
-client.on('guildCreate', async guild => {
-    
+client.on('guildCreate', async interaction => {
+    await guildData.joinGuild(interaction);
 })
 
 /*ギルド退出時*/
-client.on('guildDelete', async member => {
-
+client.on('guildDelete', async interaction => {
+    await guildData.deleteGuild(interaction);
 })
 
 
 /*ユーザー参加時*/
-client.on('guildMemberAdd', async member => {
-
+client.on('guildMemberAdd', async interaction => {
+    await guildData.joinMember(interaction);
 })
 
 /*ユーザー退出時*/
-client.on('guildMemberRemove', async member => {
-
+client.on('guildMemberRemove', async interaction => {
+    await guildData.removeMember(interaction);
 })
 
 
