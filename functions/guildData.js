@@ -16,9 +16,9 @@ exports.deleteGuild = async function(interaction){
 }
 
 exports.joinMember = async function(interaction){
-    await db.insert("main","user",{userId:interaction.user.id,guildId:interaction.guildId});
+    await db.insert("main","guildUser",{userId:interaction.user.id,guildId:interaction.guild.id});
 }
 
 exports.removeMember = async function(interaction){
-    await db.delete("main","guildMember",{userId:interaction.user.id,guildId:interaction.guildId});
+    await db.delete("main","guildUser",{userId:interaction.user.id,guildId:interaction.guild.id});
 }
