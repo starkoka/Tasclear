@@ -11,7 +11,14 @@ exports.joinGuild = async function(guild){
 
     const guildMember = await guild.members.fetch()
     for(let i=0; i < guild.memberCount;i++){
-        if(!guildMember.at(i).user.bot) await db.insert("main","guildUser",{userId:guildMember.at(i).user.id,guildId:guild.id});
+        if(!guildMember.at(i).user.bot){
+            await db.insert("main","guildUser",{
+                userId:guildMember.at(i).user.id,
+                guildId:guild.id,
+                deleteRole:[],
+                roleId:newRole.id,
+            });
+        }
     }
     await system.log(`${guild.name}(ID:${guild.id})に参加しました`,"ギルド参加通知");
 }

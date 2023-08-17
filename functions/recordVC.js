@@ -1,5 +1,6 @@
 const db = require('./db.js');
 const userData = require('./userData.js');
+const system = require('./logsystem.js');
 
 const mSecondsOfOneDay = 86400000;
 
@@ -13,6 +14,18 @@ async function joinVC(newState){
             lastUpdate: date
         }
         await db.update("main","user",{"userId":newState.id},{$set:data});
+
+        const guildUser = await db.find("main","guildUser",{"userId":newState.id});
+        for(let i = 0; i < guildUser.length; i++){
+            try{
+                const guild = client.guilds.cache.get(guildUser[i].guildId) ?? await client.guilds.fetch(guildUser[i].guildId);
+                await guild.members.addRole({
+                    user: newState.id,
+                    role: guildUser[i].roleId
+                })
+            }
+            catch{}//Discord鯖側の問題のこともあるのでもみ消す
+        }
     }
 }
 
@@ -82,7 +95,7 @@ async function leaveVC(oldState){
                         user.monthlyTotal += mSecondsOfOneDay / 1000;
                         fullDay--;
                     }
-                    if(flag)break;
+                    if(flag)break; //この時点でfullDayが0なら、for文の更新処理を行いたくない
                 }
 
                 if(fullDay === 0){
@@ -93,6 +106,18 @@ async function leaveVC(oldState){
         }
 
         await db.update("main","user",{"userId":oldState.id},{$set:user});
+
+        const guildUser = await db.find("main","guildUser",{"userId":oldState.id});
+        for(let i = 0; i < guildUser.length; i++){
+            try{
+                const guild = client.guilds.cache.get(guildUser[i].guildId) ?? await client.guilds.fetch(guildUser[i].guildId);
+                await guild.members.removeRole({
+                    user: oldState.id,
+                    role: guildUser[i].roleId
+                })
+            }
+            catch{} //Discord鯖側の問題のこともあるのでもみ消す
+        }
     }
 }
 
