@@ -37,7 +37,6 @@ client.once("ready", async () => {
         }
 
     }
-    console.log("ready");
     await system.log("Ready!");
 });
 
