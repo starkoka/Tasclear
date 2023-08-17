@@ -1,6 +1,5 @@
 const db = require('./db.js');
 const userData = require('./userData.js');
-const system = require('./logsystem.js');
 
 const mSecondsOfOneDay = 86400000;
 
