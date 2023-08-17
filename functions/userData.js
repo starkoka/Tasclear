@@ -192,7 +192,7 @@ exports.generateDataEmbed = async function func(userId,type){
     if(type === -1){
         let i=0;
         now.setDate(now.getDate() - now.getDay());
-        while(data.weeklyData[i] && i<7){
+        while(data.weeklyData[i] !== null && i<7){
             now.setDate(now.getDate() + 1);
             const time = data.weeklyData[i]/60/60;
             fields.push({
@@ -231,7 +231,7 @@ exports.generateDataEmbed = async function func(userId,type){
     else{
         if(type === 0)title = "先週";
         else title = `${type}週間前`;
-        now.setDate(now.getDate() - now.getDay());
+        now.setDate(now.getDate() - now.getDay() - 7*(type+1));
         for(let i=0; i < 7; i++){
             now.setDate(now.getDate() + 1);
             const time = data.monthlyData[type][i]/60/60;
