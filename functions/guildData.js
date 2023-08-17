@@ -17,6 +17,7 @@ exports.joinGuild = async function(guild){
                 guildId:guild.id,
                 deleteRole:[],
                 roleId:newRole.id,
+                removedRole:[]
             });
         }
     }
