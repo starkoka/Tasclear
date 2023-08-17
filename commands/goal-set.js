@@ -24,86 +24,74 @@ module.exports = [
             .addIntegerOption((option) => option.setName("時間").setDescription("時間を設定します").setRequired(true)),
 
         async execute(interaction) {
+            await interaction.deferReply({ ephemeral: true });
             // 入力されたoptionの代入
             const goal = interaction.options.getString("対象");
+            let time = interaction.options.getInteger("時間");
+            if (time === 0) time = null;
 
             const userID = interaction.user.id;
 
-            switch (goal) {
-                case "0": {
-                    let goalToday = interaction.options.getInteger("時間");
-                    if (goalToday === 0) {
-                        goalToday = null;
-                    }
-                    await db.update(
-                        "main",
-                        "user",
-                        { userId: userID },
-                        {
-                            $set: {
-                                todayGoal: goalToday,
+            if (time >= 0) {
+                switch (goal) {
+                    case "0": {
+                        await db.update(
+                            "main",
+                            "user",
+                            { userId: userID },
+                            {
+                                $set: {
+                                    todayGoal: time,
+                                },
                             },
-                        },
-                    );
-                    break;
-                }
-                case "1": {
-                    let goalThisWeek = interaction.options.getInteger("時間");
-                    if (goalThisWeek === 0) {
-                        goalThisWeek = null;
+                        );
+                        break;
                     }
-                    await db.update(
-                        "main",
-                        "user",
-                        { userId: userID },
-                        {
-                            $set: {
-                                thisWeekGoal: goalThisWeek,
+                    case "1": {
+                        await db.update(
+                            "main",
+                            "user",
+                            { userId: userID },
+                            {
+                                $set: {
+                                    thisWeekGoal: time,
+                                },
                             },
-                        },
-                    );
-                    break;
-                }
-                case "2": {
-                    let goalEveryDay = interaction.options.getInteger("時間");
-                    if (goalEveryDay === 0) {
-                        goalEveryDay = null;
+                        );
+                        break;
                     }
-                    await db.update(
-                        "main",
-                        "user",
-                        { userId: userID },
-                        {
-                            $set: {
-                                dailyGoal: goalEveryDay,
+                    case "2": {
+                        await db.update(
+                            "main",
+                            "user",
+                            { userId: userID },
+                            {
+                                $set: {
+                                    dailyGoal: time,
+                                },
                             },
-                        },
-                    );
-                    break;
-                }
-                case "3": {
-                    let goalEveryWeek = interaction.options.getInteger("時間");
-                    if (goalEveryWeek === 0) {
-                        goalEveryWeek = null;
+                        );
+                        break;
                     }
-                    await db.update(
-                        "main",
-                        "user",
-                        { userId: userID },
-                        {
-                            $set: {
-                                weeklyGoal: goalEveryWeek,
+                    case "3": {
+                        await db.update(
+                            "main",
+                            "user",
+                            { userId: userID },
+                            {
+                                $set: {
+                                    weeklyGoal: time,
+                                },
                             },
-                        },
-                    );
-                    break;
+                        );
+                        break;
+                    }
+                    default:
+                        break;
                 }
-                default:
-                    break;
-            }
-
-            // 登録確認
-            await interaction.reply({ content: "目標を設定しました", ephemeral: true });
+                // 登録確認
+                await interaction.editReply("目標を設定しました");
+            } else if (time < 0) await interaction.editReply("不正な入力です。再度実行して下さい。");
         },
     },
 ];
