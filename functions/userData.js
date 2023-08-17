@@ -192,7 +192,7 @@ exports.generateDataEmbed = async function func(userId,type){
     if(type === -1){
         let i=0;
         now.setDate(now.getDate() - now.getDay());
-        while(data.weeklyData[i] && i<7){
+        while(data.weeklyData[i] !== null && i<7){
             now.setDate(now.getDate() + 1);
             const time = data.weeklyData[i]/60/60;
             fields.push({
