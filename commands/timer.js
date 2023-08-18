@@ -2,7 +2,7 @@
 
 const crypto = require("crypto");
 
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, PermissionsBitField } = require("discord.js");
 const schedule = require("node-schedule");
 
 /**
@@ -43,13 +43,14 @@ function makeEmbed(message) {
         .setTitle("タイマー")
         .setAuthor(
             /** @type {import(discord.js).EmbedAuthorOptions} */ {
-                name: "StudyRoom BOT",
+                name: "たすくりあ",
                 iconURL: "https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png",
-                url: "https://github.com/starkoka/StudyRoom-BOT",
+                url: "https://github.com/starkoka/Tasclear",
             },
         )
         .setDescription(`${message}`)
-        .setTimestamp();
+        .setTimestamp()
+        .setFooter(/** @type {import(discord.js).EmbedFooterOptions} */ { text: "Developed by 「タスクマネージャーは応答していません」" });
 }
 
 const scheduledJobs = [];
@@ -74,13 +75,23 @@ module.exports = [
             const jobId = crypto.randomUUID();
             const { guildId } = interaction;
             const { channelId } = interaction;
+            const { user } = interaction;
             // prettier-ignore
             /** @type {import(discord.js).TextChannel} */
             const currentChannel = await interaction.client
                 .guilds.cache.get(guildId)
                 .channels.cache.get(channelId);
-            const userId = `<@${interaction.user.id}>`;
-            const roleId = interaction.options.getRole("ロール");
+
+            const rawRole = interaction.options.getRole("ロール");
+            let role = null;
+            if (rawRole) {
+                // noinspection JSUnresolvedReference cf. https://discordjs.guide/popular-topics/permissions.html#setting-role-permissions
+                if (!interaction.memberPermissions.has(PermissionsBitField.Flags.MentionEveryone) && rawRole.name === "@everyone") {
+                    interaction.reply({ content: "権限がないため`@everyone`をメンションできません", ephemeral: true });
+                    return;
+                }
+                role = rawRole;
+            }
             const today = new Date();
             const finallyDate = today.modify({ hour: hours, minute: minutes, second: seconds });
             const before1minDate = finallyDate.modify({ minute: -1 });
@@ -88,12 +99,12 @@ module.exports = [
             const reminders = [];
 
             if (today < finallyDate) {
-                reminders.push({ date: finallyDate, embed: makeEmbed("時間です"), mention: roleId || userId, silent: false });
+                reminders.push({ date: finallyDate, embed: makeEmbed("時間です"), address: role || user, silent: false });
                 if (today < before1minDate) {
                     reminders.push({
                         date: before1minDate,
                         embed: makeEmbed("設定時刻1分前です"),
-                        mention: roleId || userId,
+                        address: role || user,
                         silent: true,
                     });
                 }
@@ -101,7 +112,7 @@ module.exports = [
                     reminders.push({
                         date: before5minDate,
                         embed: makeEmbed("設定時刻5分前です"),
-                        mention: roleId || userId,
+                        address: role || user,
                         silent: true,
                     });
                 }
@@ -114,17 +125,21 @@ module.exports = [
                             jobId,
                             guildId,
                             channelId,
-                            mentionId: reminder.mention,
+                            address: reminder.address,
                             date: reminder.date,
                         });
                         // eslint-disable-next-line
                         await schedule.scheduleJob(reminder.date, async () => {
                             const message = {
-                                content: `${reminder.mention}`,
                                 embeds: [reminder.embed],
                             };
                             if (reminder.silent) message.flags = [4096];
-                            await currentChannel.send(message);
+                            if (reminder.address === role) {
+                                message.content = `${reminder.address}`;
+                                await currentChannel.send(message);
+                            } else {
+                                await user.send(message);
+                            }
                             const jobIndex = scheduledJobs.findIndex((job) => job.jobId === jobId);
                             scheduledJobs.splice(jobIndex, 1);
                         });
