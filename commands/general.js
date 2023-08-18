@@ -107,7 +107,7 @@ module.exports = [
     },
     {
         data: new SlashCommandBuilder()
-            .setName('studydata-img')
+            .setName('task-data-img')
             .setDescription('ユーザーの勉強時間を画像で表示します')
             .addIntegerOption(option =>
                 option
