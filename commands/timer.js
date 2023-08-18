@@ -2,7 +2,7 @@
 
 const crypto = require("crypto");
 
-const { SlashCommandBuilder, EmbedBuilder, PermissionsBitField } = require("discord.js");
+const {SlashCommandBuilder, EmbedBuilder, PermissionsBitField} = require("discord.js");
 const schedule = require("node-schedule");
 
 /**
@@ -49,7 +49,8 @@ function makeEmbed(message) {
             },
         )
         .setDescription(`${message}`)
-        .setTimestamp();
+        .setTimestamp()
+        .setFooter(/** @type {import(discord.js).EmbedFooterOptions} */{text: 'Developed by 「タスクマネージャーは応答していません」'});
 }
 
 const scheduledJobs = [];
@@ -72,9 +73,9 @@ module.exports = [
 
             // ジョブ生成
             const jobId = crypto.randomUUID();
-            const { guildId } = interaction;
-            const { channelId } = interaction;
-            const { user } = interaction;
+            const {guildId} = interaction;
+            const {channelId} = interaction;
+            const {user} = interaction;
             // prettier-ignore
             /** @type {import(discord.js).TextChannel} */
             const currentChannel = await interaction.client
@@ -86,19 +87,19 @@ module.exports = [
             if (rawRole) {
                 // noinspection JSUnresolvedReference cf. https://discordjs.guide/popular-topics/permissions.html#setting-role-permissions
                 if (!interaction.memberPermissions.has(PermissionsBitField.Flags.MentionEveryone) && rawRole.name === "@everyone") {
-                    interaction.reply({ content: "権限がないため`@everyone`をメンションできません", ephemeral: true });
+                    interaction.reply({content: "権限がないため`@everyone`をメンションできません", ephemeral: true});
                     return;
                 }
                 role = rawRole;
             }
             const today = new Date();
-            const finallyDate = today.modify({ hour: hours, minute: minutes, second: seconds });
-            const before1minDate = finallyDate.modify({ minute: -1 });
-            const before5minDate = finallyDate.modify({ minute: -5 });
+            const finallyDate = today.modify({hour: hours, minute: minutes, second: seconds});
+            const before1minDate = finallyDate.modify({minute: -1});
+            const before5minDate = finallyDate.modify({minute: -5});
             const reminders = [];
 
             if (today < finallyDate) {
-                reminders.push({ date: finallyDate, embed: makeEmbed("時間です"), address: role || user, silent: false });
+                reminders.push({date: finallyDate, embed: makeEmbed("時間です"), address: role || user, silent: false});
                 if (today < before1minDate) {
                     reminders.push({
                         date: before1minDate,
@@ -146,7 +147,7 @@ module.exports = [
                 }
 
                 // 登録確認
-                await interaction.reply({ content: "タイマーをセットしました", ephemeral: true });
+                await interaction.reply({content: "タイマーをセットしました", ephemeral: true});
             } else {
                 // エラー処理
                 await interaction.reply({
