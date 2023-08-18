@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import numpy as np
 import sys
 
 datum = [float(i) for i in sys.stdin.readline().split()]
@@ -14,7 +13,6 @@ y = datum
 fig, ax = plt.subplots()
 plt.xticks(x, labels)
 ax.plot(x, y, marker='o')
-
 
 plt.savefig('./img/temp/' + name + '.svg')
 
