@@ -2,7 +2,7 @@
 
 const crypto = require("crypto");
 
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, PermissionsBitField } = require("discord.js");
 const schedule = require("node-schedule");
 
 /**
@@ -80,7 +80,17 @@ module.exports = [
             const currentChannel = await interaction.client
                 .guilds.cache.get(guildId)
                 .channels.cache.get(channelId);
-            const role = interaction.options.getRole("ロール");
+
+            const rawRole = interaction.options.getRole("ロール");
+            let role = null;
+            if (rawRole) {
+                // noinspection JSUnresolvedReference cf. https://discordjs.guide/popular-topics/permissions.html#setting-role-permissions
+                if (!interaction.memberPermissions.has(PermissionsBitField.Flags.MentionEveryone) && rawRole.name === "@everyone") {
+                    interaction.reply({ content: "権限がないため`@everyone`をメンションできません", ephemeral: true });
+                    return;
+                }
+                role = rawRole;
+            }
             const today = new Date();
             const finallyDate = today.modify({ hour: hours, minute: minutes, second: seconds });
             const before1minDate = finallyDate.modify({ minute: -1 });
