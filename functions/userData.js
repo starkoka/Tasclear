@@ -247,6 +247,48 @@ exports.generateDataEmbed = async function func(user,type){
         .setFooter({ text: 'Developed by 「タスクマネージャーは応答していません」' })
 }
 
+async function sendImage(datum,labels,user,type,data,interaction,username,weeklyTotal){
+    const genChart = new PythonShell('./functions/genChart.py');
+    genChart.send(`${datum}\n${labels}\n${user.id}${type}\n${data.rank.color}`);
+    await genChart.on('message', async function (name) {
+        registerFont('./font/NotoSansCJK-Regular.ttc', {family: 'NotoSansCJK-Regular'});
+        const canvas = createCanvas(3000, 1500);
+        const ctx = canvas.getContext('2d');
+        fs.copyFileSync(`./img/data/${data.rank.name}.png`, `./img/temp/${name}.png`);
+
+        const image = await loadImage(`./img/temp/${name}.png`);
+        const iconURL = user.displayAvatarURL().slice( 0, -5 );
+        const icon = await loadImage(iconURL);
+        const chart = await loadImage(`./img/temp/${name}-chart.png`);
+        ctx.drawImage(image, 0, 0, 3000, 1500);
+        ctx.drawImage(icon, 720-512/2, 375-512/2, 512,512);
+        ctx.drawImage(chart, 2000-640*3.0/2, 725-480*3.0/2,640*3.0,480*3.0);
+
+        ctx.font = '75px "NotoSansCJK-Regular"';
+        ctx.fillStyle = '#666666';
+        ctx.textAlign = "center";
+        ctx.fillText(username, 720, 800);
+
+        ctx.font = '50px "NotoSansCJK-Regular"';
+        ctx.fillText(String(Math.floor(data.monthlyTotal/60/60*10)/10), 850, 1315);
+        if(weeklyTotal!=="---"){
+            weeklyTotal = String(Math.floor(weeklyTotal/60/60*10)/10)
+        }
+        ctx.fillText(weeklyTotal, 850, 1175);
+
+        const buffer = canvas.toBuffer();
+        fs.writeFileSync(`./img/temp/${name}.png`, buffer);
+        await interaction.editReply({
+            embed : {
+                image : {
+                    url : "attachment://userdata.png"
+                }
+            },
+            files : [{ attachment :`./img/temp/${name}.png`, name : "userdata.png"}]
+        });
+    });
+}
+
 exports.generateDataImage = async function func(user,type,interaction){
     let username;
     if(user.discriminator === "0"){
@@ -257,32 +299,36 @@ exports.generateDataImage = async function func(user,type,interaction){
     }
 
     const data = await userData.getUser(user.id);
-    const fields = [];
     let datum = "",labels = "";
-    let title = "今週";
-    let total,ave,authorTime="";
+    let total;
     const now = new Date();
     if(type === -1){
-        let i=0;
-        now.setDate(now.getDate() - now.getDay());
-        while(data.weeklyData[i] !== null && i<7){
-            now.setDate(now.getDate() + 1);
-            datum.push(Math.floor(data.weeklyData[i]/60/60*10)/10);
-            labels.push(now.toFormat("MM/DD"))
-            i++;
+        now.setDate(now.getDate() - now.getDay() + 8);
+        for(let i=6; i >= 0; i--){
+            if(i !== 6){
+                datum += " ";
+                labels += " ";
+            }
+            now.setDate(now.getDate() - 1);
+            labels += (now.toFormat("MM/DD"));
+            if(data.weeklyData[i] === null){
+                datum　+= "0";
+            }
+            else{
+                datum　+= String(Math.floor(data.weeklyData[i]/60/60*10)/10);
+            }
         }
-        total = data.weeklyTotal;
+
+        await sendImage(datum,labels,user,type,data,interaction,username,data.weeklyTotal);
     }
     else if(type === -2){
         const now2 = new Date();
-        const day = now.getDay();
         now.setDate(now.getDate() - now.getDay() + 1);
         now2.setDate(now2.getDate() - now2.getDay() + 7);
         for(let i = -1; i < 4-1 ; i++) {
             let weeklyTotal;
             if(i === -1)weeklyTotal = data.weeklyTotal/60/60;
             else weeklyTotal = data.monthlyData[i].reduce((sum, element) => sum + element, 0)/60/60
-
             if(i !== -1){
                 datum += " ";
                 labels += " ";
@@ -294,52 +340,21 @@ exports.generateDataImage = async function func(user,type,interaction){
             now2.setDate(now2.getDate() - 7);
         }
         total = data.weeklyTotal;
-
-        const genChart = new PythonShell('./functions/genChart.py');
-        genChart.send(`${datum}\n${labels}\n${user.id}${type}\n${data.rank.color}`);
-        await genChart.on('message', async function (name) {
-            registerFont('./font/NotoSansCJK-Regular.ttc', {family: 'NotoSansCJK-Regular'});
-            const canvas = createCanvas(3000, 1500);
-            const ctx = canvas.getContext('2d');
-            fs.copyFileSync(`./img/data/${data.rank.name}.png`, `./img/temp/${name}.png`);
-
-            const image = await loadImage(`./img/temp/${name}.png`);
-            const iconURL = user.displayAvatarURL().slice( 0, -5 );
-            const icon = await loadImage(iconURL);
-            const chart = await loadImage(`./img/temp/${name}-chart.png`);
-            ctx.drawImage(image, 0, 0, 3000, 1500);
-            ctx.drawImage(icon, 720-512/2, 375-512/2, 512,512);
-            ctx.drawImage(chart, 2000-640*3.0/2, 725-480*3.0/2,640*3.0,480*3.0);
-
-            ctx.font = '75px "NotoSansCJK-Regular"';
-            ctx.fillStyle = '#666666';
-            ctx.textAlign = "center";
-            ctx.fillText(username, 720, 800);
-
-            ctx.font = '50px "NotoSansCJK-Regular"';
-            ctx.fillText(String(Math.floor(data.monthlyTotal/60/60*10)/10), 850, 1315);
-            ctx.fillText("---", 850, 1175);
-
-            const buffer = canvas.toBuffer();
-            fs.writeFileSync(`./img/temp/${name}.png`, buffer);
-            await interaction.editReply({
-                embed : {
-                    image : {
-                        url : "attachment://userdata.png"
-                    }
-                },
-                files : [{ attachment :`./img/temp/${name}.png`, name : "userdata.png"}]
-            });
-        });
+        await sendImage(datum,labels,user,type,data,interaction,username,"---");
     }
     else{
-        now.setDate(now.getDate() - now.getDay() - 7*(type+1));
-        for(let i=0; i < 7; i++){
-            now.setDate(now.getDate() + 1);
-            datam[0].push(Math.floor(data.monthlyData[type][i]/60/60*10)/10);
-            labels.push(now.toFormat("MM/DD"));
+        now.setDate(now.getDate() - now.getDay() - 7*(type)-1);
+        for(let i=6; i >= 0; i--){
+            now.setDate(now.getDate() - 1);
+            if(i !== 6){
+                datum += " ";
+                labels += " ";
+            }
+            datum += String(Math.floor(data.monthlyData[type][i]/60/60*10)/10);
+            labels += (now.toFormat("MM/DD"));
         }
         total = data.monthlyData[type].reduce((sum, element) => sum + element, 0);
+        await sendImage(datum,labels,user,type,data,interaction,username,total);
     }
 
 }
