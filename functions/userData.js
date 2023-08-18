@@ -1,7 +1,10 @@
 const {EmbedBuilder} = require("discord.js");
+const {PythonShell} = require('python-shell');
 const db = require('./db.js');
 const userData = require('./userData.js');
+const system = require('./logsystem.js');
 require('date-utils');
+
 
 const ZERO = [0,0,0,0,0,0,0];
 
@@ -158,8 +161,7 @@ exports.makeUserData = async function func(userId){
     return await userData.getUser(userId);
 }
 
-exports.generateDataEmbed = async function func(userId,type){
-    const user = client.users.cache.get(userId) ?? await client.users.fetch(userId);
+exports.generateDataEmbed = async function func(user,type){
     let username;
     if(user.discriminator === "0"){
         username = `@${user.username}`;
@@ -168,26 +170,11 @@ exports.generateDataEmbed = async function func(userId,type){
         username = `${user.username}#${user.discriminator}`;
     }
 
-    if(user.bot){
-        return new EmbedBuilder()
-            .setColor(0xD9D9D9)
-            .setTitle(`${username} さんのデータ`)
-            .setThumbnail(user.displayAvatarURL())
-            .setAuthor({
-                name: 'StudyRoom BOT',
-                iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
-                url: 'https://github.com/starkoka/StudyRoom-BOT'
-            })
-            .setDescription('botのデータを確認することはできません')
-            .setTimestamp()
-            .setFooter({ text: 'Developed by 「タスクマネージャーは応答していません」' })
-    }
-
-    const data = await userData.getUser(userId);
+    const data = await userData.getUser(user.id);
 
     const fields = [];
     let title = "今週";
-    let total,ave,authorTime="",graph="";
+    let total,ave,authorTime="";
     const now = new Date();
     if(type === -1){
         let i=0;
@@ -199,7 +186,6 @@ exports.generateDataEmbed = async function func(userId,type){
                 name: now.toFormat("MM/DD"),
                 value: `\`\`\`${Math.floor(time*10)/10}時間\`\`\``
             })
-            graph += `${now.toFormat("MM/DD")} [${"#".repeat(Math.floor(time/3))}${"-".repeat(8-Math.floor(time/3))}] ${Math.floor(time*10)/10}時間\n`
             i++;
         }
         total = data.weeklyTotal;
@@ -219,7 +205,6 @@ exports.generateDataEmbed = async function func(userId,type){
                 name: `${now.toFormat("MM/DD")} ~ ${now2.toFormat("MM/DD")}`,
                 value: `\`\`\`${Math.floor(weeklyTotal*10)/10}時間\`\`\``
             })
-            graph += `${now.toFormat("MM/DD")} ~ ${now2.toFormat("MM/DD")} [${"#".repeat(Math.floor(weeklyTotal/7/3))}${"-".repeat(8-Math.floor(weeklyTotal/7/3))}]\n`
             now.setDate(now.getDate() - 7);
             now2.setDate(now2.getDate() - 7);
         }
@@ -239,17 +224,10 @@ exports.generateDataEmbed = async function func(userId,type){
                 name: now.toFormat("MM/DD"),
                 value: `\`\`\`${Math.floor(time*10)/10}時間\`\`\``
             })
-            graph += `${now.toFormat("MM/DD")} [${"#".repeat(Math.floor(time/3))}${"-".repeat(8-Math.floor(time/3))}]\n`
         }
         total = data.monthlyData[type].reduce((sum, element) => sum + element, 0);
         ave = total/7;
     }
-    /* 実験的機能のため無効化
-    fields.push({
-        name: "グラフ",
-        value: `\`\`\`${graph}\`\`\``
-    })
-    */
 
     return new EmbedBuilder()
         .setColor(data.rank.color)
@@ -264,4 +242,71 @@ exports.generateDataEmbed = async function func(userId,type){
         .addFields(fields)
         .setTimestamp()
         .setFooter({ text: 'Developed by 「タスクマネージャーは応答していません」' })
+}
+
+exports.generateDataImage = async function func(user,type){
+    let username;
+    if(user.discriminator === "0"){
+        username = `@${user.username}`;
+    }
+    else{
+        username = `${user.username}#${user.discriminator}`;
+    }
+
+    const data = await userData.getUser(user.id);
+    const fields = [];
+    let datum = "",labels = "";
+    let title = "今週";
+    let total,ave,authorTime="";
+    const now = new Date();
+    if(type === -1){
+        let i=0;
+        now.setDate(now.getDate() - now.getDay());
+        while(data.weeklyData[i] !== null && i<7){
+            now.setDate(now.getDate() + 1);
+            datum.push(Math.floor(data.weeklyData[i]/60/60*10)/10);
+            labels.push(now.toFormat("MM/DD"))
+            i++;
+        }
+        total = data.weeklyTotal;
+    }
+    else if(type === -2){
+        const now2 = new Date();
+        const day = now.getDay();
+        now.setDate(now.getDate() - now.getDay() + 1);
+        now2.setDate(now2.getDate() - now2.getDay() + 7);
+        for(let i = -1; i < 4-1 ; i++) {
+            let weeklyTotal;
+            if(i === -1)weeklyTotal = data.weeklyTotal/60/60;
+            else weeklyTotal = data.monthlyData[i].reduce((sum, element) => sum + element, 0)/60/60
+
+            if(i !== -1){
+                datum += " ";
+                labels += " ";
+            }
+            datum += `${Math.floor(weeklyTotal*10)/10}`
+            labels += `${now.toFormat("MM/DD")}~${now2.toFormat("MM/DD")}`
+
+            now.setDate(now.getDate() - 7);
+            now2.setDate(now2.getDate() - 7);
+        }
+        total = data.weeklyTotal;
+
+        const genChart = new PythonShell('./functions/genChart.py');
+        genChart.send(`${datum}\n${labels}\n${user.id}${type}`);
+        genChart.on('message', function (data) {
+            console.log(data);
+        });
+
+    }
+    else{
+        now.setDate(now.getDate() - now.getDay() - 7*(type+1));
+        for(let i=0; i < 7; i++){
+            now.setDate(now.getDate() + 1);
+            datam[0].push(Math.floor(data.monthlyData[type][i]/60/60*10)/10);
+            labels.push(now.toFormat("MM/DD"));
+        }
+        total = data.monthlyData[type].reduce((sum, element) => sum + element, 0);
+    }
+
 }
