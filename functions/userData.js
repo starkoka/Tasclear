@@ -174,13 +174,12 @@ exports.generateDataEmbed = async function func(userId,type){
             .setTitle(`${username} さんのデータ`)
             .setThumbnail(user.displayAvatarURL())
             .setAuthor({
-                name: 'StudyRoom BOT',
+                name: 'たすくりあ',
                 iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
-                url: 'https://github.com/starkoka/StudyRoom-BOT'
+                url: 'https://github.com/starkoka/Tasclear/'
             })
             .setDescription('botのデータを確認することはできません')
             .setTimestamp()
-            .setFooter({ text: 'Developed by 「タスクマネージャーは応答していません」' })
     }
 
     const data = await userData.getUser(userId);
@@ -256,12 +255,11 @@ exports.generateDataEmbed = async function func(userId,type){
         .setTitle(`${username} さんの${title}のデータ`)
         .setThumbnail(user.displayAvatarURL())
         .setAuthor({
-            name: 'StudyRoom BOT',
+            name: 'たすくりあ',
             iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
-            url: 'https://github.com/starkoka/StudyRoom-BOT'
+            url: 'https://github.com/starkoka/Tasclear/'
         })
         .setDescription(`現在のランク：${data.rank.name}\n${title}の合計時間：${Math.floor(total/60/60*10)/10}時間\n${authorTime}1日の平均時間：${Math.floor(ave/60/60*10)/10}時間`)
         .addFields(fields)
         .setTimestamp()
-        .setFooter({ text: 'Developed by 「タスクマネージャーは応答していません」' })
 }

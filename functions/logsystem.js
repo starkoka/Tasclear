@@ -11,7 +11,7 @@ exports.log = async function func(message,title) {
     const date = new Date().toLocaleString(); // YYYY/MM/DD hh:mm:ss形式に変換
     console.log(`${title ?? "システムログ"} ----\n${(message.trim().split("```").join(''))}\n--------${date}\n`);
     const embed = new EmbedBuilder()
-        .setColor(0x00A0EA)
+        .setColor(0x3CDE99)
         .setTitle(title ?? "システムログ")
         .setDescription(message)
         .setTimestamp()

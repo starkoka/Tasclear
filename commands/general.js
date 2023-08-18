@@ -37,12 +37,12 @@ module.exports = [
             .setDescription('このBOTの概要を表示します'),
         async execute(interaction){
             const embed = new EmbedBuilder()
-                .setColor(0x00A0EA)
-                .setTitle('StudyRoom BOT概要')
+                .setColor(0x3CDE99)
+                .setTitle('たすくりあ　概要')
                 .setAuthor({
-                    name: 'StudyRoom BOT',
+                    name: 'たすくりあ',
                     iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
-                    url: 'https://github.com/starkoka/StudyRoom-BOT'
+                    url: 'https://github.com/starkoka/Tasclear/'
                 })
                 .setDescription('このbotの概要を紹介します')
                 .addFields(
@@ -53,26 +53,25 @@ module.exports = [
                         },
                         {
                             name: 'ソースコード',
-                            value: 'このBOTは、オープンソースとなっています。[GitHub](https://github.com/starkoka/StudyRoom-BOT)にて公開されています。\n'
+                            value: 'このBOTは、オープンソースとなっています。[GitHub](https://github.com/starkoka/Tasclear/)にて公開されています。\n'
                         },
                         {
                             name: 'バグの報告先',
-                            value: "[Issue](https://github.com/starkoka/StudyRoom-BOT/issues)までバグの報告をお願いします。\nサポート等の詳細は`/help`や`/admin-help`を実行してください。\n"
+                            value: "[Issue](https://github.com/starkoka/Tasclear/issues)までバグの報告をお願いします。\nサポート等の詳細は`/help`や`/admin-help`を実行してください。\n"
                         },
                         {
                             name: '実行環境',
-                            value: `node.js v${process.versions.node} \ndiscord.js v${version} \n\nDocker v24.0.2\nMongoDB 6.0 Powered by Google Cloud`
+                            value: `node.js v${process.versions.node} \ndiscord.js v${version} \nPython 3.11 \n\nMongoDB 6.0 Powered by Google Cloud`
                         },
                     ]
                 )
                 .setTimestamp()
-                .setFooter({ text: 'Developed by 「タスクマネージャーは応答していません」' })
             await interaction.reply({ embeds: [embed ]})
         },
     },
     {
         data: new SlashCommandBuilder()
-            .setName('studydata')
+            .setName('task-data')
             .setDescription('ユーザーの勉強時間を表示します')
             .addIntegerOption(option =>
                 option

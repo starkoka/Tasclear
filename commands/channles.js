@@ -1,10 +1,11 @@
 const { SlashCommandBuilder, EmbedBuilder} = require('discord.js');
 const db = require('../functions/db.js');
+const help = require("../functions/help");
 
 module.exports = [
     {
         data: new SlashCommandBuilder()
-            .setName('add-studyroom')
+            .setName('add-room')
             .setDMPermission(false)
             .setDefaultMemberPermissions(1<<3)
             .setDescription('VCを登録します')
@@ -22,13 +23,13 @@ module.exports = [
             }
             else{
                 await db.updateOrInsert("main","VC",{"channelId":channel.id},{"channelId":channel.id,"type":false,guildId:channel.guildId});
-                await interaction.editReply({content: `<#${channel.id}>を自習室に登録しました`});
+                await interaction.editReply({content: `<#${channel.id}>をルームに登録しました`});
             }
         },
     },
     {
         data: new SlashCommandBuilder()
-            .setName('del-studyroom')
+            .setName('del-room')
             .setDMPermission(false)
             .setDefaultMemberPermissions(1<<3)
             .setDescription('VCの登録を解除します')
@@ -46,15 +47,15 @@ module.exports = [
             }
             else{
                 await db.delete("main","VC",{"channelId":channel.id});
-                await interaction.editReply({content: `<#${channel.id}>の自習室登録を解除しました`});
+                await interaction.editReply({content: `<#${channel.id}>のルーム登録を解除しました`});
             }
         },
     },
     {
         data: new SlashCommandBuilder()
-            .setName('roomlist')
+            .setName('room-list')
             .setDMPermission(false)
-            .setDescription('このサーバーの自習室一覧を表示します'),
+            .setDescription('このサーバーのルーム一覧を表示します'),
         async execute(interaction) {
             await interaction.deferReply();
             const channels = await db.find("main","VC",{"guildId":interaction.guildId});
@@ -64,31 +65,68 @@ module.exports = [
                 for(let i=0;i<channels.length;i++) {
                     field.push({
                         name:`<#${channels[i].channelId}>`,
-                        value:`タイプ：自習室`
+                        value:`タイプ：作業ルーム`
                     });
                 }
             }
             else{
                 field.push({
                     name:`未登録`,
-                    value:`登録されているチャンネルはありません`
+                    value:`登録されているルームはありません`
                 });
             }
 
             const embed = new EmbedBuilder()
-                .setColor(0x00A0EA)
-                .setTitle(`自習室一覧`)
+                .setColor(0x3CDE99)
+                .setTitle(`ルーム一覧`)
                 .setAuthor({
-                    name: "StudyRoom BOT",
+                    name: "たすくりあ",
                     iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
-                    url: 'https://github.com/starkoka/StudyRoom-BOT'
+                    url: 'https://github.com/starkoka/Tasclear/'
                 })
-                .setDescription(`${guild.name} に登録されている自習室一覧です。`)
+                .setDescription(`${guild.name} に登録されているルーム一覧です。`)
                 .addFields(field)
-                .setTimestamp()
-                .setFooter({ text: 'Developed by 「タスクマネージャーは応答していません」' });
+                .setTimestamp();
 
             await interaction.editReply({embeds: [embed]});
+        },
+    },
+    {
+        data: new SlashCommandBuilder()
+            .setName('news-set')
+            .setDescription('BOTからのお知らせを受け取るチャンネルを指定します')
+            .setDefaultMemberPermissions(1<<3)
+            .setDMPermission(false)
+            .addChannelOption(option =>
+                option
+                    .setName('チャンネル')
+                    .setDescription('チャンネルを指定します(未指定で解除されます)')
+                    .setRequired(false)
+            ),
+        async execute(interaction) {
+            await interaction.deferReply({ephemeral: true});
+            if(interaction.options.getChannel('チャンネル')){
+                const channel = interaction.options.getChannel('チャンネル');
+                if(channel.type !== 0   ){
+                    await interaction.editReply({content: "チャンネルオプションにはテキストチャンネルを指定してください。"});
+                }
+                else{
+                    await db.update("main","guild",{guildId:interaction.guild.id},{
+                        $set:{
+                            newsId:interaction.options.getChannel('チャンネル').id
+                        }
+                    });
+                    await interaction.editReply("登録しました");
+                }
+            }
+            else{
+                await db.update("main","guild",{guildId:interaction.guild.id},{
+                    $set:{
+                        newsId:null
+                    }
+                });
+                await interaction.editReply("登録を解除しました");
+            }
         },
     },
 ]

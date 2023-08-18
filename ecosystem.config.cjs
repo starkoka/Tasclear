@@ -3,7 +3,7 @@
 module.exports = {
     apps: [
         {
-            name: "StudyRoom-BOT",
+            name: "たすくりあ",
             script: "./main.js",
             instance_var: "INSTANCE_ID",
             env_dev: {

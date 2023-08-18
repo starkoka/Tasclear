@@ -1,6 +1,6 @@
 {
-  "name": "studyroom-bot",
-  "version": "0.0.0",
+  "name": "tasclear",
+  "version": "0.0.0-BETA",
   "description": "ボイスチャットに参加している時間を勉強時間と見なし、時間を記録するBOTです。",
   "main": "main.js",
   "scripts": {
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/starkoka/StudyRoom-BOT.git"
+    "url": "git+https://github.com/starkoka/Tasclear/.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/starkoka/StudyRoom-BOT/issues"
+    "url": "https://github.com/starkoka/Tasclear/issues"
   },
-  "homepage": "https://github.com/starkoka/StudyRoom-BOT#readme",
+  "homepage": "https://github.com/starkoka/Tasclear/#readme",
   "dependencies": {
     "@discordjs/rest": "^1.5.0",
     "date-utils": "^1.2.21",

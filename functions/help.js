@@ -24,16 +24,15 @@ for(let i=0;i < helpText.help.length;i++){
 
 exports.adminHelpSend = async function func(user) {
     const embed = new EmbedBuilder()
-        .setColor(0x00A0EA)
+        .setColor(0x3CDE99)
         .setTitle(`管理者向けヘルプ`)
         .setAuthor({
-            name: "StudyRoom BOT",
+            name: "たすくりあ",
             iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
-            url: 'https://github.com/starkoka/StudyRoom-BOT'
+            url: 'https://github.com/starkoka/Tasclear/'
         })
-        .setDescription("StudyRoom BOTをご利用いただきありがとうございます。\n管理者向けのヘルプでは、主に以下に記載した管理者向けのBOTの情報や機能についての説明があります。\n\n下のセレクトメニューから内容を選ぶことで、ヘルプを読めます。\n")
-        .setTimestamp()
-        .setFooter({ text: 'Developed by 「タスクマネージャーは応答していません」' });
+        .setDescription("たすくりあをご利用いただきありがとうございます。\n管理者向けのヘルプでは、主に以下に記載した管理者向けのBOTの情報や機能についての説明があります。\n\n下のセレクトメニューから内容を選ぶことで、ヘルプを読めます。\n")
+        .setTimestamp();
 
     const select = new StringSelectMenuBuilder()
         .setCustomId('adminHelp')
@@ -53,17 +52,16 @@ exports.adminHelpSend = async function func(user) {
 exports.adminHelpDisplay = async function func(interaction) {
     const page = parseFloat(interaction.values[0]);
     const newEmbed = new EmbedBuilder()
-        .setColor(0x00A0EA)
+        .setColor(0x3CDE99)
         .setTitle(`管理者向けヘルプ - ${helpText.admin[page].value.title}`)
         .setAuthor({
-            name: "StudyRoom BOT",
+            name: "たすくりあ",
             iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
-            url: 'https://github.com/starkoka/StudyRoom-BOT'
+            url: 'https://github.com/starkoka/Tasclear/'
         })
         .setDescription(helpText.admin[page].value.description)
         .addFields(helpText.admin[page].value.field)
-        .setTimestamp()
-        .setFooter({ text: 'Developed by 「タスクマネージャーは応答していません」' });
+        .setTimestamp();
     try{
         await interaction.update({embeds: [newEmbed]});
     }
@@ -74,16 +72,15 @@ exports.adminHelpDisplay = async function func(interaction) {
 
 exports.helpSend = async function func(interaction) {
     const embed = new EmbedBuilder()
-        .setColor(0x00A0EA)
+        .setColor(0x3CDE99)
         .setTitle(`ヘルプ`)
         .setAuthor({
-            name: "StudyRoom BOT",
+            name: "たすくりあ",
             iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
-            url: 'https://github.com/starkoka/StudyRoom-BOT'
+            url: 'https://github.com/starkoka/Tasclear/'
         })
-        .setDescription("StudyRoomBOTをご利用いただきありがとうございます。\nヘルプでは、このBOTの機能の使い方等を確認できます。\n\n下のセレクトメニューから内容を選ぶことで、ヘルプを読めます。\n")
-        .setTimestamp()
-        .setFooter({ text: 'Developed by 「タスクマネージャーは応答していません」' });
+        .setDescription("たすくりあをご利用いただきありがとうございます。\nヘルプでは、このBOTの機能の使い方等を確認できます。\n\n下のセレクトメニューから内容を選ぶことで、ヘルプを読めます。\n")
+        .setTimestamp();
 
     const select = new StringSelectMenuBuilder()
         .setCustomId('help')
@@ -98,16 +95,15 @@ exports.helpSend = async function func(interaction) {
 exports.helpDisplay = async function func(interaction) {
     const page = parseFloat(interaction.values[0]);
     const newEmbed = new EmbedBuilder()
-        .setColor(0x00A0EA)
+        .setColor(0x3CDE99)
         .setTitle(`ヘルプ - ${helpText.help[page].value.title}`)
         .setAuthor({
-            name: "StudyRoom BOT",
+            name: "たすくりあ",
             iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
-            url: 'https://github.com/starkoka/StudyRoom-BOT'
+            url: 'https://github.com/starkoka/Tasclear/'
         })
         .setDescription(helpText.help[page].value.description)
         .addFields(helpText.help[page].value.field)
-        .setTimestamp()
-        .setFooter({ text: 'Developed by 「タスクマネージャーは応答していません」' });
+        .setTimestamp();
     await interaction.update({embeds: [newEmbed]});
 }
