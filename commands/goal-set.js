@@ -1,5 +1,7 @@
 /** @format */
 
+const { setTimeout } = require("node:timers/promises");
+
 const { SlashCommandBuilder } = require("discord.js");
 
 const db = require("../functions/db.js");
@@ -90,8 +92,39 @@ module.exports = [
                         break;
                 }
                 // 登録確認
-                await interaction.editReply("目標を設定しました");
-            } else if (time < 0) await interaction.editReply("不正な入力です。再度実行して下さい。");
+                // await interaction.editReply("目標を設定しました");
+                // eslint-disable-next-line
+                const replyOptions = (count) => {
+                    return {
+                        content: `目標を設定しました。\n(このメッセージは${count}秒後に自動で削除されます)`,
+                        ephemeral: true,
+                    };
+                };
+                await interaction.editReply(replyOptions(5));
+                for (let i = 5; i > 0; i--) {
+                    // eslint-disable-next-line
+                    await interaction.editReply(replyOptions(i));
+                    // eslint-disable-next-line
+                    await setTimeout(1000);
+                }
+                await interaction.deleteReply();
+            } else if (time < 0) {
+                // eslint-disable-next-line
+                const replyOptions = (count) => {
+                    return {
+                        content: `不正な入力です。再度実行してください\n(このメッセージは${count}秒後に自動で削除されます)`,
+                        ephemeral: true,
+                    };
+                };
+                await interaction.editReply(replyOptions(5));
+                for (let i = 5; i > 0; i--) {
+                    // eslint-disable-next-line
+                    await interaction.editReply(replyOptions(i));
+                    // eslint-disable-next-line
+                    await setTimeout(1000);
+                }
+                await interaction.deleteReply();
+            }
         },
     },
 ];
