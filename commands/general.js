@@ -75,6 +75,7 @@ module.exports = [
         data: new SlashCommandBuilder()
             .setName('studydata')
             .setDescription('ユーザーの勉強時間を表示します')
+            .setDMPermission(false)
             .addIntegerOption(option =>
                 option
                     .setName('期間')
@@ -104,7 +105,7 @@ module.exports = [
     },
     {
         data: new SlashCommandBuilder()
-            .setName('studyrank')
+            .setName('ranking')
             .setDescription('ギルド内ランキングを表示します')
             .addIntegerOption(option =>
                 option
