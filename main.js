@@ -64,12 +64,12 @@ client.on("interactionCreate", async (interaction) => {
     catch(error) {
         await system.error(`スラッシュコマンド実行時エラー : ${command.data.name}\n\`\`\`\nギルド　　：${guild.name}\n(ID:${guild.id})\n\nチャンネル：${channel.name}\n(ID:${channel.id})\n\nユーザ　　：${interaction.user.username}#${interaction.user.discriminator}\n(ID:${interaction.user.id})\`\`\``, error);
         try {
-            await interaction.reply({content: 'おっと、想定外の事態が起きちゃった。[Issue](https://github.com/starkoka/StudyRoom-BOT/issues)に連絡してくれ。', ephemeral: true});
+            await interaction.reply({content: 'おっと、想定外の事態が起きちゃった。[Issue](https://github.com/starkoka/Tasclear/issues)に連絡してくれ。', ephemeral: true});
         }
         catch {
             try{
                 await interaction.editReply({
-                    content: 'おっと、想定外の事態が起きちゃった。[Issue](https://github.com/starkoka/StudyRoom-BOT/issues)に連絡してくれ。',
+                    content: 'おっと、想定外の事態が起きちゃった。[Issue](https://github.com/starkoka/Tasclear/issues)に連絡してくれ。',
                     ephemeral: true
                 });
             }

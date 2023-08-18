@@ -3,11 +3,11 @@ const system = require('./logsystem.js');
 
 exports.joinGuild = async function(guild){
     const newRole = await guild.roles.create({
-        name: 'Studying now',
-        color: 0x00A0EA,
-        reason: "StudyRoom BOTにより作成"
+        name: 'タスク処理中',
+        color: 0x3CDE99,
+        reason: "たすくりあにより作成"
     });
-    await db.insert("main","guild",{guildId:guild.id,roleId:newRole.id,deleteRole:[]});
+    await db.insert("main","guild",{guildId:guild.id,roleId:newRole.id,deleteRole:[],newsId:null});
 
     const guildMember = await guild.members.fetch()
     for(let i=0; i < guild.memberCount;i++){

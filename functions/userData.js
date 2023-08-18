@@ -174,7 +174,6 @@ exports.generateDataEmbed = async function func(user,type){
     }
 
     const data = await userData.getUser(user.id);
-
     const fields = [];
     let title = "今週";
     let total,ave,authorTime="";
@@ -237,9 +236,9 @@ exports.generateDataEmbed = async function func(user,type){
         .setTitle(`${username} さんの${title}のデータ`)
         .setThumbnail(user.displayAvatarURL())
         .setAuthor({
-            name: 'StudyRoom BOT',
+            name: 'たすくりあ',
             iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
-            url: 'https://github.com/starkoka/StudyRoom-BOT'
+            url: 'https://github.com/starkoka/Tasclear/'
         })
         .setDescription(`現在のランク：${data.rank.name}\n${title}の合計時間：${Math.floor(total/60/60*10)/10}時間\n${authorTime}1日の平均時間：${Math.floor(ave/60/60*10)/10}時間`)
         .addFields(fields)
@@ -368,5 +367,4 @@ exports.generateDataImage = async function func(user,type,interaction){
         total = data.monthlyData[type].reduce((sum, element) => sum + element, 0);
         await sendImage(datum,labels,user,type,data,interaction,username,total);
     }
-
 }
