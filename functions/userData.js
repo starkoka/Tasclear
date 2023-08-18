@@ -1,5 +1,8 @@
 const {EmbedBuilder} = require("discord.js");
 const {PythonShell} = require('python-shell');
+const fs = require("fs");
+const {createCanvas,loadImage,registerFont} = require("canvas");
+
 const db = require('./db.js');
 const userData = require('./userData.js');
 const system = require('./logsystem.js');
@@ -244,7 +247,7 @@ exports.generateDataEmbed = async function func(user,type){
         .setFooter({ text: 'Developed by 「タスクマネージャーは応答していません」' })
 }
 
-exports.generateDataImage = async function func(user,type){
+exports.generateDataImage = async function func(user,type,interaction){
     let username;
     if(user.discriminator === "0"){
         username = `@${user.username}`;
@@ -294,10 +297,30 @@ exports.generateDataImage = async function func(user,type){
 
         const genChart = new PythonShell('./functions/genChart.py');
         genChart.send(`${datum}\n${labels}\n${user.id}${type}`);
-        genChart.on('message', function (data) {
-            console.log(data);
-        });
+        await genChart.on('message', async function (name) {
+            registerFont('./font/NotoSansCJK-Regular.ttc', {family: 'NotoSansCJK-Regular'});
+            const canvas = createCanvas(3000, 1500);
+            const ctx = canvas.getContext('2d');
+            fs.copyFileSync(`./img/data/${data.rank.name}.png`, `./img/temp/${name}.png`);
 
+            const image = await loadImage(`./img/temp/${name}.png`);
+            ctx.drawImage(image, 0, 0, 3000, 1500);
+            ctx.font = '75px "NotoSansCJK-Regular"';
+            ctx.fillStyle = '#666666';
+            ctx.textAlign = "center";
+            ctx.fillText(username, 720, 800);
+
+            const buffer = canvas.toBuffer();
+            fs.writeFileSync(`./img/temp/${name}.png`, buffer);
+            await interaction.editReply({
+                embed : {
+                    image : {
+                        url : "attachment://userdata.png"
+                    }
+                },
+                files : [{ attachment :`./img/temp/${name}.png`, name : "userdata.png"}]
+            });
+        });
     }
     else{
         now.setDate(now.getDate() - now.getDay() - 7*(type+1));

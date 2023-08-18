@@ -129,8 +129,7 @@ module.exports = [
             }
             else{
                 const type = interaction.options.getInteger('期間') ?? -1;
-                const img = await userData.generateDataImage(interaction.user,type);
-                //await interaction.editReply({embeds: [embed]});
+                await userData.generateDataImage(interaction.user,type,interaction);
             }
         },
     },

@@ -16,4 +16,4 @@ ax.plot(x, y, marker='o')
 
 plt.savefig('./img/temp/' + name + '.svg')
 
-print("success")
+print(name)
