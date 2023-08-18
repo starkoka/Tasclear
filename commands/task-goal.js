@@ -27,7 +27,7 @@ function makeEmbed(color, userName, avatarURL, fields) {
         .setThumbnail(avatarURL)
         .setAuthor(
             /** @type {import(discord.js).EmbedAuthorOptions} */ {
-                name: "Tasclear",
+                name: "たすくりあ",
                 iconURL: "https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png",
                 url: "https://github.com/starkoka/Tasclear",
             },
@@ -35,6 +35,51 @@ function makeEmbed(color, userName, avatarURL, fields) {
         .addFields(/** @type any */ fields)
         .setTimestamp()
         .setFooter(/** @type {import(discord.js).EmbedFooterOptions} */ { text: "Developed by 「タスクマネージャーは応答していません」" });
+}
+
+/** プログレスバーの生成
+ * @param {number} totalTime 計測時間[s]
+ * @param {number} goal 目標時間[s]
+ * @return {string} */
+function makeProgressBar(totalTime, goal) {
+    let progressBar = "[";
+    if (totalTime <= goal) {
+        const progress = 20 - ((goal - totalTime) / goal) * 20;
+        for (let i = 0; i < Math.floor(progress); i++) {
+            progressBar += `#`;
+        }
+        progressBar += `#`;
+        for (let i = 0; i < 20 - Math.floor(progress); i++) {
+            progressBar += `-`;
+        }
+        progressBar += `] ${Math.floor((progress / 2) * 100) / 10}% DONE`;
+    } else {
+        progressBar += "####################] 100% DONE";
+    }
+    return progressBar;
+}
+
+/** Fieldの生成
+ * @param {string} scope 目標の対象
+ * @param {number} totalTime 計測時間[s]
+ * @param {number} goal 目標時間[s]
+ * @return {{name: string, value: string}} */
+function makeField(scope, totalTime, goal) {
+    const hour = Math.floor(totalTime / 3600);
+    const min = Math.floor((totalTime % 3600) / 60);
+    const sec = totalTime % 60;
+    let convertedTime = `${sec}秒`;
+    if (hour !== 0) {
+        convertedTime = `${hour}時間${min}分${convertedTime}`;
+    } else if (min !== 0) {
+        convertedTime = `${min}分${convertedTime}`;
+    }
+    const details = `計測時間: \`\`${convertedTime}\`\`\n目標時間: \`\`${goal / 3600}時間\`\``;
+    const progressBar = `\`\`\`${goal == null ? "目標が設定されていないため表示できません" : makeProgressBar(totalTime, goal)}\`\`\``;
+    return {
+        name: scope,
+        value: `${details}\n${progressBar}`,
+    };
 }
 
 module.exports = [
@@ -60,6 +105,9 @@ module.exports = [
             const avatarURL = user.displayAvatarURL();
 
             /* fields生成 */
+            const dbDay = [6, 0, 1, 2, 3, 4, 5];
+            const jsDay = new Date().getDay();
+            const currentDay = dbDay[jsDay];
             const goals = {
                 todayGoal: userData.todayGoal * 3600,
                 thisWeekGoal: userData.thisWeekGoal * 3600,
@@ -67,16 +115,15 @@ module.exports = [
                 weeklyGoal: userData.weeklyGoal * 3600,
             };
             const timedData = {
-                todayTotal: userData.weeklyData[4 /* 月曜 */],
+                todayTotal: userData.weeklyData[currentDay],
                 weeklyTotal: userData.weeklyTotal,
             };
             const fields = [];
-            fields.push({
-                name: "today",
-                value: `${timedData.todayTotal}/${goals.todayGoal}`,
-            });
+            fields.push(makeField("今日", timedData.todayTotal, goals.todayGoal));
+            fields.push(makeField("今週", timedData.weeklyTotal, goals.thisWeekGoal));
+            fields.push(makeField("毎日", timedData.todayTotal, goals.dailyGoal));
+            fields.push(makeField("毎週", timedData.weeklyTotal, goals.weeklyGoal));
 
-            console.log(JSON.stringify(userData));
             interaction.reply({ embeds: [makeEmbed(color, userName, avatarURL, fields)] });
         },
     },
