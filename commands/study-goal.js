@@ -1,28 +1,30 @@
 /** @format */
 
-/** @typedef Goals
- *  @property {number} todayGoal 今日の目標時間[s]
- *  @property {number} thisWeekGoal 今週の目標時間[s]
- *  @property {number} dailyGoal 毎日の目標時間[s]
- *  @property {number} weeklyGoal 毎週の目標時間[s] */
-
-/** @typedef TimedData
- *  @property {number} todayTotal 今日計測された時間の合計[s]
- *  @property {number} thisWeekTotal 今週計測された時間の合計[s]
- */
+/** @typedef UserData
+ *  @property {string} userId DiscordのユーザーID
+ *  @property {{name: string, color:number}} rank 現在のランク
+ *  @property {number} todayGoal 今週の目標時間[h]
+ *  @property {number} thisWeekGoal 今週の目標時間[h]
+ *  @property {number} dailyGoal 毎日の目標時間[h]
+ *  @property {number} weeklyGoal 毎週の目標時間[h]
+ *  @property {number[]} weeklyData[] 今週のデータ(0が月曜)[s]
+ *  @property {number} weeklyTotal 今週の合計[s] */
 
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+
 const { find } = require("../functions/db.js");
 
 /** Embedの生成
+ * @param {number} color ランクの色
  * @param {string} userName 対象のユーザ名
- * @param {Goals} goals 目標時間
- * @param {{todayTotal: *, weeklyTotal: *}} timedData 計測された時間の合計
+ * @param {string} avatarURL ユーザのアイコンURL
+ * @param {{name: string, value: string}[]} fields フィールドデータ
  * @return {EmbedBuilder} */
-function makeEmbed(userName, goals, timedData) {
+function makeEmbed(color, userName, avatarURL, fields) {
     return new EmbedBuilder()
-        .setColor(0x00a0ea)
+        .setColor(color)
         .setTitle(`${userName} さんの進捗データ`)
+        .setThumbnail(avatarURL)
         .setAuthor(
             /** @type {import(discord.js).EmbedAuthorOptions} */ {
                 name: "Tasclear",
@@ -30,15 +32,23 @@ function makeEmbed(userName, goals, timedData) {
                 url: "https://github.com/starkoka/Tasclear",
             },
         )
-        .setTimestamp();
+        .addFields(/** @type any */ fields)
+        .setTimestamp()
+        .setFooter(/** @type {import(discord.js).EmbedFooterOptions} */ { text: "Developed by 「タスクマネージャーは応答していません」" });
 }
 
 module.exports = [
     {
-        data: new SlashCommandBuilder().setName("studygoal").setDescription("設定した目標と現在の進捗状況を表示します"),
+        data: new SlashCommandBuilder().setName("task-goal").setDescription("設定した目標と現在の進捗状況を表示します"),
         async execute(interaction) {
-            // ユーザーネーム取得
+            /* DBからデータを取得してオブジェクト生成 */
             const { user } = interaction;
+            const userData = /** @type UserData */ (await find("main", "user", { userId: user.id })).shift();
+
+            /* color取得 */
+            const { color } = userData.rank;
+
+            /* ユーザーネーム取得 */
             let userName;
             if (user.discriminator === "0") {
                 userName = `@${user.username}`;
@@ -46,21 +56,28 @@ module.exports = [
                 userName = `${user.username}#${user.discriminator}`;
             }
 
-            // DBからデータを取得してオブジェクト生成
-            const userData = (await find("main", "user", { userId })).shift();
+            /* ユーザアイコン取得 */
+            const avatarURL = user.displayAvatarURL();
+
+            /* fields生成 */
             const goals = {
-                todayGoal: userData.todayGoal,
-                thisWeekGoal: userData.thisWeekGoal,
-                dailyGoal: userData.dailyGoal,
-                weeklyGoal: userData.weeklyGoal,
+                todayGoal: userData.todayGoal * 3600,
+                thisWeekGoal: userData.thisWeekGoal * 3600,
+                dailyGoal: userData.dailyGoal * 3600,
+                weeklyGoal: userData.weeklyGoal * 3600,
             };
             const timedData = {
-                todayTotal: userData.weeklyData[0 /* 月曜 */],
+                todayTotal: userData.weeklyData[4 /* 月曜 */],
                 weeklyTotal: userData.weeklyTotal,
             };
+            const fields = [];
+            fields.push({
+                name: "today",
+                value: `${timedData.todayTotal}/${goals.todayGoal}`,
+            });
 
             console.log(JSON.stringify(userData));
-            interaction.reply({ embeds: [makeEmbed(userName, goals, timedData)] });
+            interaction.reply({ embeds: [makeEmbed(color, userName, avatarURL, fields)] });
         },
     },
 ];
