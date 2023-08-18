@@ -43,9 +43,9 @@ function makeEmbed(message) {
         .setTitle("タイマー")
         .setAuthor(
             /** @type {import(discord.js).EmbedAuthorOptions} */ {
-                name: "StudyRoom BOT",
+                name: "Tasclear",
                 iconURL: "https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png",
-                url: "https://github.com/starkoka/StudyRoom-BOT",
+                url: "https://github.com/starkoka/Tasclear",
             },
         )
         .setDescription(`${message}`)
