@@ -296,7 +296,7 @@ exports.generateDataImage = async function func(user,type,interaction){
         total = data.weeklyTotal;
 
         const genChart = new PythonShell('./functions/genChart.py');
-        genChart.send(`${datum}\n${labels}\n${user.id}${type}`);
+        genChart.send(`${datum}\n${labels}\n${user.id}${type}\n${data.rank.color}`);
         await genChart.on('message', async function (name) {
             registerFont('./font/NotoSansCJK-Regular.ttc', {family: 'NotoSansCJK-Regular'});
             const canvas = createCanvas(3000, 1500);
@@ -304,11 +304,21 @@ exports.generateDataImage = async function func(user,type,interaction){
             fs.copyFileSync(`./img/data/${data.rank.name}.png`, `./img/temp/${name}.png`);
 
             const image = await loadImage(`./img/temp/${name}.png`);
+            const iconURL = user.displayAvatarURL().slice( 0, -5 );
+            const icon = await loadImage(iconURL);
+            const chart = await loadImage(`./img/temp/${name}-chart.png`);
             ctx.drawImage(image, 0, 0, 3000, 1500);
+            ctx.drawImage(icon, 720-512/2, 375-512/2, 512,512);
+            ctx.drawImage(chart, 2000-640*3.0/2, 725-480*3.0/2,640*3.0,480*3.0);
+
             ctx.font = '75px "NotoSansCJK-Regular"';
             ctx.fillStyle = '#666666';
             ctx.textAlign = "center";
             ctx.fillText(username, 720, 800);
+
+            ctx.font = '50px "NotoSansCJK-Regular"';
+            ctx.fillText(String(Math.floor(data.monthlyTotal/60/60*10)/10), 850, 1315);
+            ctx.fillText("---", 850, 1175);
 
             const buffer = canvas.toBuffer();
             fs.writeFileSync(`./img/temp/${name}.png`, buffer);
