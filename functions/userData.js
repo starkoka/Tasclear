@@ -248,45 +248,57 @@ exports.generateDataEmbed = async function func(user,type){
 }
 
 async function sendImage(datum,labels,user,type,data,interaction,username,weeklyTotal){
-    const genChart = new PythonShell('./functions/genChart.py');
-    genChart.send(`${datum}\n${labels}\n${user.id}${type}\n${data.rank.color}`);
-    await genChart.on('message', async function (name) {
-        registerFont('./font/NotoSansCJK-Regular.ttc', {family: 'NotoSansCJK-Regular'});
-        const canvas = createCanvas(3000, 1500);
-        const ctx = canvas.getContext('2d');
-        fs.copyFileSync(`./img/data/${data.rank.name}.png`, `./img/temp/${name}.png`);
+    try{
+        const genChart = new PythonShell('./functions/genChart.py');
+        genChart.send(`${datum}\n${labels}\n${user.id}${type}\n${data.rank.color}`);
+        await genChart.on('message', async function (name) {
+            registerFont('./font/NotoSansCJK-Regular.ttc', {family: 'NotoSansCJK-Regular'});
+            const canvas = createCanvas(3000, 1500);
+            const ctx = canvas.getContext('2d');
+            fs.copyFileSync(`./img/data/${data.rank.name}.png`, `./img/temp/${name}.png`);
 
-        const image = await loadImage(`./img/temp/${name}.png`);
-        const iconURL = user.displayAvatarURL().slice( 0, -5 );
-        const icon = await loadImage(iconURL);
-        const chart = await loadImage(`./img/temp/${name}-chart.png`);
-        ctx.drawImage(image, 0, 0, 3000, 1500);
-        ctx.drawImage(icon, 720-512/2, 375-512/2, 512,512);
-        ctx.drawImage(chart, 2000-640*3.0/2, 725-480*3.0/2,640*3.0,480*3.0);
+            const image = await loadImage(`./img/temp/${name}.png`);
+            const iconURL = user.displayAvatarURL().slice( 0, -5 );
+            const icon = await loadImage(iconURL);
+            const chart = await loadImage(`./img/temp/${name}-chart.png`);
+            ctx.drawImage(image, 0, 0, 3000, 1500);
+            ctx.drawImage(icon, 720-512/2, 375-512/2, 512,512);
+            ctx.drawImage(chart, 2000-640*3.0/2, 725-480*3.0/2,640*3.0,480*3.0);
 
-        ctx.font = '75px "NotoSansCJK-Regular"';
-        ctx.fillStyle = '#666666';
-        ctx.textAlign = "center";
-        ctx.fillText(username, 720, 800);
+            ctx.font = '75px "NotoSansCJK-Regular"';
+            ctx.fillStyle = '#666666';
+            ctx.textAlign = "center";
+            ctx.fillText(username, 720, 800);
 
-        ctx.font = '50px "NotoSansCJK-Regular"';
-        ctx.fillText(String(Math.floor(data.monthlyTotal/60/60*10)/10), 850, 1315);
-        if(weeklyTotal!=="---"){
-            weeklyTotal = String(Math.floor(weeklyTotal/60/60*10)/10)
-        }
-        ctx.fillText(weeklyTotal, 850, 1175);
+            ctx.font = '50px "NotoSansCJK-Regular"';
+            ctx.fillText(String(Math.floor(data.monthlyTotal/60/60*10)/10), 850, 1315);
+            if(weeklyTotal!=="---"){
+                weeklyTotal = String(Math.floor(weeklyTotal/60/60*10)/10)
+            }
+            ctx.fillText(weeklyTotal, 850, 1175);
 
-        const buffer = canvas.toBuffer();
-        fs.writeFileSync(`./img/temp/${name}.png`, buffer);
-        await interaction.editReply({
-            embed : {
-                image : {
-                    url : "attachment://userdata.png"
-                }
-            },
-            files : [{ attachment :`./img/temp/${name}.png`, name : "userdata.png"}]
+            const buffer = canvas.toBuffer();
+            fs.writeFileSync(`./img/temp/${name}.png`, buffer);
+            await interaction.editReply({
+                embed : {
+                    image : {
+                        url : "attachment://userdata.png"
+                    }
+                },
+                files : [{ attachment :`./img/temp/${name}.png`, name : "userdata.png"}]
+            });
+            try{
+                fs.unlinkSync(`./img/temp/${name}.png`);
+                fs.unlinkSync(`./img/temp/${name}-chart.png`);
+            }
+            catch(err){
+                await system.error("画像キャッシュの削除に失敗しました",err,"キャッシュ削除失敗");
+            }
         });
-    });
+    }
+    catch{
+        await interaction.editReply("画像の生成・送信時に失敗しました。短時間で同じコマンドを実行するとエラーが発生するおそれがあります。\n時間を開けてもう一度お試しください。");
+    }
 }
 
 exports.generateDataImage = async function func(user,type,interaction){
