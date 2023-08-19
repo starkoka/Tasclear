@@ -39,7 +39,7 @@ Date.prototype.modify = function (obj) {
  * @return {EmbedBuilder} */
 function makeEmbed(message) {
     return new EmbedBuilder()
-        .setColor(0x00a0ea)
+        .setColor(0x3CDE99)
         .setTitle("タイマー")
         .setAuthor(
             /** @type {import(discord.js).EmbedAuthorOptions} */ {
@@ -49,8 +49,7 @@ function makeEmbed(message) {
             },
         )
         .setDescription(`${message}`)
-        .setTimestamp()
-        .setFooter(/** @type {import(discord.js).EmbedFooterOptions} */ { text: "Developed by 「タスクマネージャーは応答していません」" });
+        .setTimestamp();
 }
 
 const scheduledJobs = [];
@@ -59,6 +58,7 @@ module.exports = [
     {
         data: new SlashCommandBuilder()
             .setName("timer")
+            .setDMPermission(false)
             .setDescription("指定した時間のタイマーをかけます")
             .addIntegerOption((option) => option.setName("時間").setDescription("待機する時間を指定します").setRequired(true))
             .addIntegerOption((option) => option.setName("分").setDescription("待機する分間を指定します").setRequired(true))

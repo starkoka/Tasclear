@@ -1,7 +1,13 @@
 const {EmbedBuilder} = require("discord.js");
+const {PythonShell} = require('python-shell');
+const fs = require("fs");
+const {createCanvas,loadImage,registerFont} = require("canvas");
+
 const db = require('./db.js');
 const userData = require('./userData.js');
+const system = require('./logsystem.js');
 require('date-utils');
+
 
 const ZERO = [0,0,0,0,0,0,0];
 
@@ -158,8 +164,7 @@ exports.makeUserData = async function func(userId){
     return await userData.getUser(userId);
 }
 
-exports.generateDataEmbed = async function func(userId,type){
-    const user = client.users.cache.get(userId) ?? await client.users.fetch(userId);
+exports.generateDataEmbed = async function func(user,type){
     let username;
     if(user.discriminator === "0"){
         username = `@${user.username}`;
@@ -168,26 +173,10 @@ exports.generateDataEmbed = async function func(userId,type){
         username = `${user.username}#${user.discriminator}`;
     }
 
-    if(user.bot){
-        return new EmbedBuilder()
-            .setColor(0xD9D9D9)
-            .setTitle(`${username} さんのデータ`)
-            .setThumbnail(user.displayAvatarURL())
-            .setAuthor({
-                name: 'StudyRoom BOT',
-                iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
-                url: 'https://github.com/starkoka/StudyRoom-BOT'
-            })
-            .setDescription('botのデータを確認することはできません')
-            .setTimestamp()
-            .setFooter({ text: 'Developed by 「タスクマネージャーは応答していません」' })
-    }
-
-    const data = await userData.getUser(userId);
-
+    const data = await userData.getUser(user.id);
     const fields = [];
     let title = "今週";
-    let total,ave,authorTime="",graph="";
+    let total,ave,authorTime="";
     const now = new Date();
     if(type === -1){
         let i=0;
@@ -199,7 +188,6 @@ exports.generateDataEmbed = async function func(userId,type){
                 name: now.toFormat("MM/DD"),
                 value: `\`\`\`${Math.floor(time*10)/10}時間\`\`\``
             })
-            graph += `${now.toFormat("MM/DD")} [${"#".repeat(Math.floor(time/3))}${"-".repeat(8-Math.floor(time/3))}] ${Math.floor(time*10)/10}時間\n`
             i++;
         }
         total = data.weeklyTotal;
@@ -219,7 +207,6 @@ exports.generateDataEmbed = async function func(userId,type){
                 name: `${now.toFormat("MM/DD")} ~ ${now2.toFormat("MM/DD")}`,
                 value: `\`\`\`${Math.floor(weeklyTotal*10)/10}時間\`\`\``
             })
-            graph += `${now.toFormat("MM/DD")} ~ ${now2.toFormat("MM/DD")} [${"#".repeat(Math.floor(weeklyTotal/7/3))}${"-".repeat(8-Math.floor(weeklyTotal/7/3))}]\n`
             now.setDate(now.getDate() - 7);
             now2.setDate(now2.getDate() - 7);
         }
@@ -239,29 +226,145 @@ exports.generateDataEmbed = async function func(userId,type){
                 name: now.toFormat("MM/DD"),
                 value: `\`\`\`${Math.floor(time*10)/10}時間\`\`\``
             })
-            graph += `${now.toFormat("MM/DD")} [${"#".repeat(Math.floor(time/3))}${"-".repeat(8-Math.floor(time/3))}]\n`
         }
         total = data.monthlyData[type].reduce((sum, element) => sum + element, 0);
         ave = total/7;
     }
-    /* 実験的機能のため無効化
-    fields.push({
-        name: "グラフ",
-        value: `\`\`\`${graph}\`\`\``
-    })
-    */
 
     return new EmbedBuilder()
         .setColor(data.rank.color)
         .setTitle(`${username} さんの${title}のデータ`)
         .setThumbnail(user.displayAvatarURL())
         .setAuthor({
-            name: 'StudyRoom BOT',
+            name: 'たすくりあ',
             iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
-            url: 'https://github.com/starkoka/StudyRoom-BOT'
+            url: 'https://github.com/starkoka/Tasclear/'
         })
         .setDescription(`現在のランク：${data.rank.name}\n${title}の合計時間：${Math.floor(total/60/60*10)/10}時間\n${authorTime}1日の平均時間：${Math.floor(ave/60/60*10)/10}時間`)
         .addFields(fields)
         .setTimestamp()
         .setFooter({ text: 'Developed by 「タスクマネージャーは応答していません」' })
+}
+
+async function sendImage(datum,labels,user,type,data,interaction,username,weeklyTotal){
+    try{
+        const genChart = new PythonShell('./functions/genChart.py');
+        genChart.send(`${datum}\n${labels}\n${user.id}${type}\n${data.rank.color}`);
+        await genChart.on('message', async function (name) {
+            registerFont('./font/NotoSansCJK-Regular.ttc', {family: 'NotoSansCJK-Regular'});
+            const canvas = createCanvas(3000, 1500);
+            const ctx = canvas.getContext('2d');
+            fs.copyFileSync(`./img/data/${data.rank.name}.png`, `./img/temp/${name}.png`);
+
+            const image = await loadImage(`./img/temp/${name}.png`);
+            const iconURL = user.displayAvatarURL().slice( 0, -5 );
+            const icon = await loadImage(iconURL);
+            const chart = await loadImage(`./img/temp/${name}-chart.png`);
+            ctx.drawImage(image, 0, 0, 3000, 1500);
+            ctx.drawImage(icon, 720-512/2, 375-512/2, 512,512);
+            ctx.drawImage(chart, 2000-640*3.0/2, 725-480*3.0/2,640*3.0,480*3.0);
+
+            ctx.font = '75px "NotoSansCJK-Regular"';
+            ctx.fillStyle = '#666666';
+            ctx.textAlign = "center";
+            ctx.fillText(username, 720, 800);
+
+            ctx.font = '50px "NotoSansCJK-Regular"';
+            ctx.fillText(String(Math.floor(data.monthlyTotal/60/60*10)/10), 850, 1315);
+            if(weeklyTotal!=="---"){
+                weeklyTotal = String(Math.floor(weeklyTotal/60/60*10)/10)
+            }
+            ctx.fillText(weeklyTotal, 850, 1175);
+
+            const buffer = canvas.toBuffer();
+            fs.writeFileSync(`./img/temp/${name}.png`, buffer);
+            await interaction.editReply({
+                embed : {
+                    image : {
+                        url : "attachment://userdata.png"
+                    }
+                },
+                files : [{ attachment :`./img/temp/${name}.png`, name : "userdata.png"}]
+            });
+            try{
+                fs.unlinkSync(`./img/temp/${name}.png`);
+                fs.unlinkSync(`./img/temp/${name}-chart.png`);
+            }
+            catch(err){
+                await system.error("画像キャッシュの削除に失敗しました",err,"キャッシュ削除失敗");
+            }
+        });
+    }
+    catch{
+        await interaction.editReply("画像の生成・送信時に失敗しました。短時間で同じコマンドを実行するとエラーが発生するおそれがあります。\n時間を開けてもう一度お試しください。");
+    }
+}
+
+exports.generateDataImage = async function func(user,type,interaction){
+    let username;
+    if(user.discriminator === "0"){
+        username = `@${user.username}`;
+    }
+    else{
+        username = `${user.username}#${user.discriminator}`;
+    }
+
+    const data = await userData.getUser(user.id);
+    let datum = "",labels = "";
+    let total;
+    const now = new Date();
+    if(type === -1){
+        now.setDate(now.getDate() - now.getDay() + 8);
+        for(let i=6; i >= 0; i--){
+            if(i !== 6){
+                datum += " ";
+                labels += " ";
+            }
+            now.setDate(now.getDate() - 1);
+            labels += (now.toFormat("MM/DD"));
+            if(data.weeklyData[i] === null){
+                datum　+= "0";
+            }
+            else{
+                datum　+= String(Math.floor(data.weeklyData[i]/60/60*10)/10);
+            }
+        }
+
+        await sendImage(datum,labels,user,type,data,interaction,username,data.weeklyTotal);
+    }
+    else if(type === -2){
+        const now2 = new Date();
+        now.setDate(now.getDate() - now.getDay() + 1);
+        now2.setDate(now2.getDate() - now2.getDay() + 7);
+        for(let i = -1; i < 4-1 ; i++) {
+            let weeklyTotal;
+            if(i === -1)weeklyTotal = data.weeklyTotal/60/60;
+            else weeklyTotal = data.monthlyData[i].reduce((sum, element) => sum + element, 0)/60/60
+            if(i !== -1){
+                datum += " ";
+                labels += " ";
+            }
+            datum += `${Math.floor(weeklyTotal*10)/10}`
+            labels += `${now.toFormat("MM/DD")}~${now2.toFormat("MM/DD")}`
+
+            now.setDate(now.getDate() - 7);
+            now2.setDate(now2.getDate() - 7);
+        }
+        total = data.weeklyTotal;
+        await sendImage(datum,labels,user,type,data,interaction,username,"---");
+    }
+    else{
+        now.setDate(now.getDate() - now.getDay() - 7*(type)-1);
+        for(let i=6; i >= 0; i--){
+            now.setDate(now.getDate() - 1);
+            if(i !== 6){
+                datum += " ";
+                labels += " ";
+            }
+            datum += String(Math.floor(data.monthlyData[type][i]/60/60*10)/10);
+            labels += (now.toFormat("MM/DD"));
+        }
+        total = data.monthlyData[type].reduce((sum, element) => sum + element, 0);
+        await sendImage(datum,labels,user,type,data,interaction,username,total);
+    }
 }

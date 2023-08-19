@@ -39,12 +39,12 @@ body:
   - type: textarea
     attributes:
       label: 環境
-      description: StudyRoom BOTの実行環境を入力してください．
+      description: たすくりあの実行環境を入力してください．
       placeholder: 内容を入力してください
       value: |
         + **OS**: Windows 11 Pro 22H2
         + **Discord**: Stable 199933 (db1e138)
-        + **StudyRoom BOT**: v1.0.0
+        + **たすくりあ**: v0.0.0-BETA
     validations:
       required: true
   - type: textarea
