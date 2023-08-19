@@ -13,6 +13,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 
 const { find } = require("../functions/db.js");
+const getUser = require("../functions/userData.js");
 
 /** Embedの生成
  * @param {number} color ランクの色
@@ -74,7 +75,7 @@ function makeField(scope, totalTime, goal) {
     } else if (min !== 0) {
         convertedTime = `${min}分${convertedTime}`;
     }
-    const details = `計測時間: \`\`${convertedTime}\`\`\n目標時間: \`\`${goal / 3600}時間\`\``;
+    const details = `計測時間: \`\`${convertedTime}\`\`\n目標時間: \`\`${goal === null ? "---" : goal / 3600}時間\`\``;
     const progressBar = `\`\`\`${goal == null ? "目標が設定されていないため表示できません" : makeProgressBar(totalTime, goal)}\`\`\``;
     return {
         name: scope,
@@ -88,7 +89,7 @@ module.exports = [
         async execute(interaction) {
             /* DBからデータを取得してオブジェクト生成 */
             const { user } = interaction;
-            const userData = /** @type UserData */ (await find("main", "user", { userId: user.id })).shift();
+            const userData = /** @type UserData */ await getUser.getUser(user.id);
 
             /* color取得 */
             const { color } = userData.rank;
@@ -109,10 +110,10 @@ module.exports = [
             const jsDay = new Date().getDay();
             const currentDay = dbDay[jsDay];
             const goals = {
-                todayGoal: userData.todayGoal * 3600,
-                thisWeekGoal: userData.thisWeekGoal * 3600,
-                dailyGoal: userData.dailyGoal * 3600,
-                weeklyGoal: userData.weeklyGoal * 3600,
+                todayGoal: userData.todayGoal === null ? null : userData.todayGoal * 3600,
+                thisWeekGoal: userData.thisWeekGoal === null ? null : userData.thisWeekGoal * 3600,
+                dailyGoal: userData.dailyGoal === null ? null : userData.dailyGoal * 3600,
+                weeklyGoal: userData.weeklyGoal === null ? null : userData.weeklyGoal * 3600,
             };
             const timedData = {
                 todayTotal: userData.weeklyData[currentDay],
