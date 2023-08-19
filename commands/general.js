@@ -42,7 +42,7 @@ module.exports = [
                 .setTitle('たすくりあ　概要')
                 .setAuthor({
                     name: 'たすくりあ',
-                    iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
+                    iconURL: 'https://cdn.discordapp.com/avatars/1084327261785833474/5a3be1413c9a8211fd3b35e1592f4c01.webp',
                     url: 'https://github.com/starkoka/Tasclear/'
                 })
                 .setDescription('このbotの概要を紹介します')
@@ -189,7 +189,7 @@ module.exports = [
                 .setTitle(`${interaction.guild.name} の${title}のランキング`)
                 .setAuthor({
                     name: 'たすくりあ',
-                    iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
+                    iconURL: 'https://cdn.discordapp.com/avatars/1084327261785833474/5a3be1413c9a8211fd3b35e1592f4c01.webp',
                     url: 'https://github.com/starkoka/Tasclear'
                 })
                 .setDescription(`${title}の上位20人のランキングです。\n(現在VCに入っている人は、一度退出すると反映されます)`)

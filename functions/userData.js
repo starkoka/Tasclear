@@ -237,7 +237,7 @@ exports.generateDataEmbed = async function func(user,type){
         .setThumbnail(user.displayAvatarURL())
         .setAuthor({
             name: 'たすくりあ',
-            iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
+            iconURL: 'https://cdn.discordapp.com/avatars/1084327261785833474/5a3be1413c9a8211fd3b35e1592f4c01.webp',
             url: 'https://github.com/starkoka/Tasclear/'
         })
         .setDescription(`現在のランク：${data.rank.name}\n${title}の合計時間：${Math.floor(total/60/60*10)/10}時間\n${authorTime}1日の平均時間：${Math.floor(ave/60/60*10)/10}時間`)

@@ -28,7 +28,7 @@ exports.adminHelpSend = async function func(user) {
         .setTitle(`管理者向けヘルプ`)
         .setAuthor({
             name: "たすくりあ",
-            iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
+            iconURL: 'https://cdn.discordapp.com/avatars/1084327261785833474/5a3be1413c9a8211fd3b35e1592f4c01.webp',
             url: 'https://github.com/starkoka/Tasclear/'
         })
         .setDescription("たすくりあをご利用いただきありがとうございます。\n管理者向けのヘルプでは、主に以下に記載した管理者向けのBOTの情報や機能についての説明があります。\n\n下のセレクトメニューから内容を選ぶことで、ヘルプを読めます。\n")
@@ -56,7 +56,7 @@ exports.adminHelpDisplay = async function func(interaction) {
         .setTitle(`管理者向けヘルプ - ${helpText.admin[page].value.title}`)
         .setAuthor({
             name: "たすくりあ",
-            iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
+            iconURL: 'https://cdn.discordapp.com/avatars/1084327261785833474/5a3be1413c9a8211fd3b35e1592f4c01.webp',
             url: 'https://github.com/starkoka/Tasclear/'
         })
         .setDescription(helpText.admin[page].value.description)
@@ -76,7 +76,7 @@ exports.helpSend = async function func(interaction) {
         .setTitle(`ヘルプ`)
         .setAuthor({
             name: "たすくりあ",
-            iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
+            iconURL: 'https://cdn.discordapp.com/avatars/1084327261785833474/5a3be1413c9a8211fd3b35e1592f4c01.webp',
             url: 'https://github.com/starkoka/Tasclear/'
         })
         .setDescription("たすくりあをご利用いただきありがとうございます。\nヘルプでは、このBOTの機能の使い方等を確認できます。\n\n下のセレクトメニューから内容を選ぶことで、ヘルプを読めます。\n")
@@ -99,7 +99,7 @@ exports.helpDisplay = async function func(interaction) {
         .setTitle(`ヘルプ - ${helpText.help[page].value.title}`)
         .setAuthor({
             name: "たすくりあ",
-            iconURL: 'https://media.discordapp.net/attachments/1004598980929404960/1039920326903087104/nitkc22io-1.png',
+            iconURL: 'https://cdn.discordapp.com/avatars/1084327261785833474/5a3be1413c9a8211fd3b35e1592f4c01.webp',
             url: 'https://github.com/starkoka/Tasclear/'
         })
         .setDescription(helpText.help[page].value.description)
