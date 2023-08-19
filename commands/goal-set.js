@@ -1,10 +1,7 @@
-/** @format */
-
 const { setTimeout } = require("node:timers/promises");
-
 const { SlashCommandBuilder } = require("discord.js");
-
 const db = require("../functions/db.js");
+const userData = require("../functions/userData.js");
 
 module.exports = [
     {
@@ -33,6 +30,7 @@ module.exports = [
             if (time === 0) time = null;
 
             const userID = interaction.user.id;
+            const data = await userData.getUser(userID);
 
             if (time >= 0) {
                 switch (goal) {
