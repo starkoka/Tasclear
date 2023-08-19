@@ -2,6 +2,7 @@ const { Client, GatewayIntentBits, Collection, Partials,Events} = require('disco
 const config = require('./config.json');
 const path = require("path");
 const fs = require("fs");
+const cron = require('node-cron');
 global.client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -20,6 +21,7 @@ const system = require('./functions/logsystem.js');
 const help = require('./functions/help.js');
 const recordVC = require('./functions/recordVC.js');
 const guildData = require('./functions/guildData.js');
+const db = require('./functions/db.js');
 
 /*スラッシュコマンド登録*/
 const commandsPath = path.join(__dirname, 'commands');
@@ -115,6 +117,16 @@ client.on('guildMemberAdd', async interaction => {
 client.on('guildMemberRemove', async interaction => {
     await guildData.removeMember(interaction);
 })
+
+/*ステータス更新*/
+cron.schedule('* * * * *', async () => {
+    const joined = await db.find("main","user",{isJoined:true});
+    client.user.setPresence({
+        activities: [{
+            name: `${joined.length}人がタスク`
+        }],
+    });
+});
 
 
 
